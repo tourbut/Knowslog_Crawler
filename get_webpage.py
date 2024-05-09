@@ -1,3 +1,7 @@
+from bs4 import BeautifulSoup, Tag
+
+import requests
+
 def get_dom(url,ssl_verify=False,headers={'User-Agent': 'Mozilla/5.0'}):
     response = requests.get(url, verify=ssl_verify,headers=headers)
     response.raise_for_status()
