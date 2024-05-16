@@ -46,7 +46,7 @@ results = DDGS().news(keywords=f"{suggestions[0]['phrase']} -site:msn.com",
                       max_results=20)
 
 #print(results)
-#url = results[0]['url']
-#dom = get_dom(url)
-#contents = get_contents(dom)
-#print(contents)
+url = results[0]['url']
+dom = get_dom(url)
+contents = get_contents(dom)
+print(contents)
