@@ -1,3 +1,4 @@
+from duckduckgo_search import DDGS
 from bs4 import BeautifulSoup, Tag
 
 import requests
@@ -33,8 +34,19 @@ def parse_dom(node):
         return '\n'.join(parsed_content)
     else:
         return None
-    
-url=""
-dom = get_dom(url)
-contents = get_contents(dom)
-print(contents)
+
+suggestions = DDGS().suggestions("Latest AI News",region="us-en")
+#print(suggestions)
+answers = DDGS().answers('sun')
+print(answers)
+results = DDGS().news(keywords=f"{suggestions[0]['phrase']} -site:msn.com", 
+                      region="us-en",
+                      safesearch="moderate", 
+                      timelimit="d", 
+                      max_results=20)
+
+#print(results)
+#url = results[0]['url']
+#dom = get_dom(url)
+#contents = get_contents(dom)
+#print(contents)
