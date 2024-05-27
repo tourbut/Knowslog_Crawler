@@ -53,7 +53,7 @@ results = DDGS().news(keywords=f"{suggestions[0]['phrase']} -site:msn.com",
                       max_results=20)
 
 #print(results)
-url = 'https://www.deeplearning.ai/the-batch/issue-249/'
+url = 'https://medium.com/towards-artificial-intelligence/extractthinker-ai-document-intelligence-with-llms-72cbce1890ef'
 dom = get_dom(url)
 contents = get_contents(dom)
 print(contents)
