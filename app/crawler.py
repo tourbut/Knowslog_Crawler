@@ -14,7 +14,7 @@ def get_medium(url, txt_html):
     return _rtn
 
 
-def get_dom(url,ssl_verify=False,headers={'User-Agent': 'Mozilla/5.0'}):
+def get_dom(url,ssl_verify,headers):
     response = requests.get(url, verify=ssl_verify,headers=headers)
     response.raise_for_status()
     return BeautifulSoup(response.text, 'html.parser')
@@ -55,7 +55,7 @@ def parse_dom(node):
     else:
         return None
 
-def get_webpage(url):
-    dom = get_dom(url)
+def get_webpage(url,ssl_verify=False,headers={'User-Agent': 'Mozilla/5.0'}):
+    dom = get_dom(url,ssl_verify,headers)
     contents = get_contents(dom) 
     return contents

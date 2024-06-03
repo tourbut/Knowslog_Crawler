@@ -33,6 +33,6 @@ def get_summary_prompt():
     
 def create_chain():
     prompt = get_summary_prompt()
-    llm = ChatOpenAI(model = 'gpt-4o',temperature=0.1)
+    llm = ChatOpenAI(model = 'gpt-4o',temperature=0.5)
     chain = prompt|llm
     return chain
