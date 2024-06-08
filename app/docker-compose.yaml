@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: knowsdb
+    environment:
+      POSTGRES_DB: knowsdb
+      POSTGRES_USER: knowslog
+      POSTGRES_PASSWORD: knowslog1!
+      PGDATA: /var/lib/postgresql/pgdata
+    volumes:
+      - ./database/pgdata:/var/lib/postgresql/pgdata
+      - ./database/initdb:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
