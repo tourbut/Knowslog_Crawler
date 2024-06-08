@@ -1,9 +1,20 @@
-from duckduckgo_search import DDGS
+from medium_to_markdown.Parser import MediumParser
 from bs4 import BeautifulSoup, Tag
 
 import requests
 
-def get_dom(url,ssl_verify=False,headers={'User-Agent': 'Mozilla/5.0'}):
+def get_medium(url, txt_html):
+    
+    parser = MediumParser(url=url,
+                          is_image_download = False,
+                          ssl_verify = True)
+    
+    _rtn = parser.parse(txt_html=txt_html,is_save=False)
+    
+    return _rtn
+
+
+def get_dom(url,ssl_verify,headers):
     response = requests.get(url, verify=ssl_verify,headers=headers)
     response.raise_for_status()
     return BeautifulSoup(response.text, 'html.parser')
@@ -44,16 +55,7 @@ def parse_dom(node):
     else:
         return None
 
-suggestions = DDGS().suggestions("Latest AI News",region="us-en")
-#print(suggestions)
-results = DDGS().news(keywords=f"{suggestions[0]['phrase']} -site:msn.com", 
-                      region="us-en",
-                      safesearch="moderate", 
-                      timelimit="d", 
-                      max_results=20)
-
-#print(results)
-url = 'https://medium.com/towards-artificial-intelligence/extractthinker-ai-document-intelligence-with-llms-72cbce1890ef'
-dom = get_dom(url)
-contents = get_contents(dom)
-print(contents)
+def get_webpage(url,ssl_verify=False,headers={'User-Agent': 'Mozilla/5.0'}):
+    dom = get_dom(url,ssl_verify,headers)
+    contents = get_contents(dom) 
+    return contents
