@@ -1,5 +1,20 @@
-from langchain.prompts import PromptTemplate,ChatPromptTemplate
-from langchain_openai import ChatOpenAI
+from langchain.prompts import PromptTemplate
+
+def get_translate_prompt():
+    return PromptTemplate.from_template(
+        template="""
+<INSTRUCTION>
+<DOCUMENT> 에 입력된 텍스트를 한국어로 완벽하게 번역하시오.
+누락되는 내용이 없도록 주의하시오.
+문서내의 링크는 그대로 유지하시오.
+최종 출력 포맷은 Markdown형식으로 고정합니다.
+</INSTRUCTION>
+
+<DOCUMENT>
+{document}
+</DOCUMENT>
+"""
+    )
 
 def get_summary_prompt():
     return PromptTemplate.from_template(
@@ -30,9 +45,3 @@ def get_summary_prompt():
 </출력양식>
 """
     )
-    
-def create_chain():
-    prompt = get_summary_prompt()
-    llm = ChatOpenAI(model = 'gpt-4o',temperature=0.5)
-    chain = prompt|llm
-    return chain
