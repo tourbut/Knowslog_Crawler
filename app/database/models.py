@@ -55,3 +55,16 @@ class Archive(Base):
     update_date = Column(DateTime, nullable=True, default=datetime.datetime.now())
     delete_yn = Column(Boolean, nullable=True, default=False)
 
+class Refine(Base):
+    __tablename__ = "refine"
+
+    id = Column(Integer, primary_key=True)
+    archive_id = Column(Integer, ForeignKey("archive.id"))
+    refine_ymd = Column(String, nullable=False)
+    title = Column(String, nullable=True)
+    author = Column(String, nullable=True)
+    content = Column(Text, nullable=False)
+    url = Column(String, nullable=False)
+    create_date = Column(DateTime, nullable=True, default=datetime.datetime.now())
+    update_date = Column(DateTime, nullable=True, default=datetime.datetime.now())
+    delete_yn = Column(Boolean, nullable=True, default=False)

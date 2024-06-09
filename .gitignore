@@ -4,3 +4,4 @@
 .DS_Store
 test/*.md
 app/database/pgdata
+app/database/migrations
