@@ -1,4 +1,3 @@
-
 from sqlalchemy import MetaData, Boolean, Column, Integer, String, Text, DateTime, ForeignKey,Table,Float,JSON
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
