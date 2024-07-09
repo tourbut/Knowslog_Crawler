@@ -3,40 +3,29 @@ from bs4 import BeautifulSoup, Tag
 
 import requests
 
-def get_medium(url, txt_html):
-    
-    parser = MediumParser(url=url,
-                          is_image_download = False,
-                          ssl_verify = True)
-    
-    _rtn = parser.parse(txt_html=txt_html,is_save=False)
-    
-    return _rtn
-
-
-def get_dom(url,ssl_verify,headers):
+def _get_dom(url,ssl_verify,headers):
     response = requests.get(url, verify=ssl_verify,headers=headers)
     response.raise_for_status()
     return BeautifulSoup(response.text, 'html.parser')
 
-def get_contents(dom):
+def _get_contents(dom):
     parsed_post = []
     
     for node in dom.children:
-        content = parse_dom(node)
+        content = _parse_dom(node)
         if content:
             parsed_post.append(content)
     
     return '\n'.join(parsed_post)
 
-def parse_dom(node):
+def _parse_dom(node):
     parsed_content = []
 
     if isinstance(node, Tag):
         #print(node.name)
         if node.name in ["script", "style",'html','meta','head','body','div','main','figure','header','article']:
             for child in node.children:
-                child_content = parse_dom(child)
+                child_content = _parse_dom(child)
                 if child_content:
                     parsed_content.append(child_content)
         elif node.name == "link":
@@ -56,6 +45,16 @@ def parse_dom(node):
         return None
 
 def get_webpage(url,ssl_verify=False,headers={'User-Agent': 'Mozilla/5.0'}):
-    dom = get_dom(url,ssl_verify,headers)
-    contents = get_contents(dom) 
+    dom = _get_dom(url,ssl_verify,headers)
+    contents = _get_contents(dom) 
     return contents
+
+def get_medium(url, txt_html):
+    
+    parser = MediumParser(url=url,
+                          is_image_download = False,
+                          ssl_verify = True)
+    
+    _rtn = parser.parse(txt_html=txt_html,is_save=False)
+    
+    return _rtn

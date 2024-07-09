@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -5,34 +6,33 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from dotenv import load_dotenv
-
-import os
-load_dotenv()
-
-POSTGRES_SERVER_IP = os.getenv("POSTGRES_SERVER_IP")
-POSTGRES_SERVER_PORT = os.getenv("POSTGRES_SERVER_PORT")
-POSTGRES_DATABASE_NAME = os.getenv("POSTGRES_DATABASE_NAME")
-POSTGRES_USER = os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-
-SQLALCHEMY_DATABASE_URL = f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER_IP}:{POSTGRES_SERVER_PORT}/{POSTGRES_DATABASE_NAME}"
-print(SQLALCHEMY_DATABASE_URL)
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
-config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
+
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+def get_url():
+    user = os.getenv("POSTGRES_USER", "postgres")
+    password = os.getenv("POSTGRES_PASSWORD", "")
+    server = os.getenv("POSTGRES_SERVER", "db")
+    port = os.getenv("POSTGRES_PORT", "5432")
+    db = os.getenv("POSTGRES_DB", "app")
+    return f"postgresql+psycopg://{user}:{password}@{server}:{port}/{db}"
+
+config.set_main_option("sqlalchemy.url", get_url())
+
 # add your model's MetaData object here
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-import models
-target_metadata = models.Base.metadata
+#target_metadata = None
+from app.models import SQLModel
+
+target_metadata = SQLModel.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
