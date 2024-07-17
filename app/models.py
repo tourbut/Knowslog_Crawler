@@ -1,9 +1,9 @@
 from sqlmodel import Field, Relationship, SQLModel,DateTime,String,Integer,JSON
 from pydantic import EmailStr
+from typing import Optional
+from sqlalchemy.dialects.postgresql import JSONB
 
 from datetime import datetime
-
-from sympy import content
 
 class CommonBase(SQLModel):
     create_date: datetime = Field(default=datetime.now())
@@ -26,7 +26,7 @@ class UserDetail(CommonBase, table=True):
     llm_model: str | None = Field(nullable=True)
     api_key: str | None = Field(nullable=True)
     interests: str | None = Field(nullable=True)
-    json_data: JSON | None = Field(nullable=True)
+    json_data: Optional[dict] = Field(nullable=True, sa_type=JSONB)
     
 class Archive(CommonBase, table=True):
     id: int | None = Field(default=None, primary_key=True)

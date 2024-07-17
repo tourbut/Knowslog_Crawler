@@ -21,7 +21,7 @@ def get_url():
     server = os.getenv("POSTGRES_SERVER", "db")
     port = os.getenv("POSTGRES_PORT", "5432")
     db = os.getenv("POSTGRES_DB", "app")
-    return f"postgresql+psycopg://{user}:{password}@{server}:{port}/{db}"
+    return f"postgresql://{user}:{password}@{server}:{port}/{db}"
 
 config.set_main_option("sqlalchemy.url", get_url())
 
@@ -30,7 +30,7 @@ config.set_main_option("sqlalchemy.url", get_url())
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
 #target_metadata = None
-from app.models import SQLModel
+from models import SQLModel
 
 target_metadata = SQLModel.metadata
 

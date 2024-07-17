@@ -1,4 +1,4 @@
-from app.models import *
+from models import *
 from sqlmodel import SQLModel
 from sqlmodel import Session, select
 
@@ -10,3 +10,14 @@ class UserCreate(CommonBase):
 
 class UserPublic(SQLModel):
     id: int
+
+
+class ArchiveCreate(CommonBase):
+    id: int 
+    category: str
+    collect_ymd: str 
+    language: str
+    title: str 
+    author: str 
+    content: str 
+    url : str 

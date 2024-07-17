@@ -9,7 +9,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 
 from fastapi import Depends
 
-from app.config import settings
+from config import settings
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
 async_engine = create_async_engine(str(settings.SQLALCHEMY_DATABASE_URI))
