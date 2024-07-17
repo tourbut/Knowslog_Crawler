@@ -53,7 +53,7 @@ def get_medium(url, txt_html):
     
     parser = MediumParser(url=url,
                           is_image_download = False,
-                          ssl_verify = True)
+                          ssl_verify = False)
     
     _rtn = parser.parse(txt_html=txt_html,is_save=False)
     

@@ -10,7 +10,7 @@ def create_user(*, session: Session, user_create: UserCreate) -> User:
     session.refresh(db_obj)
     return db_obj
 
-def create_archive(*, session: Session, archive_create: ArchiveCreate) -> Archive:
+def create_archive(session: Session, archive_create: ArchiveCreate) -> Archive:
     db_obj = Archive.model_validate(archive_create)
     session.add(db_obj)
     session.commit()

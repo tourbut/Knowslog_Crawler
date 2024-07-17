@@ -1,5 +1,5 @@
-from crawler import get_webpage, get_medium
-from llms.llm_model import create_chain
+from engine.crawler import get_webpage, get_medium
+from engine.llms.llm_model import create_chain
 
 if __name__ == "__main__":
     url ="https://arxiv.org/html/2405.12130v1"

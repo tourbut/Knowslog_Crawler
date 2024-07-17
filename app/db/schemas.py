@@ -13,7 +13,6 @@ class UserPublic(SQLModel):
 
 
 class ArchiveCreate(CommonBase):
-    id: int 
     category: str
     collect_ymd: str 
     language: str

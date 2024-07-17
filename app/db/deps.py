@@ -5,6 +5,7 @@ from sqlmodel import Session,create_engine
 
 
 from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.orm import sessionmaker
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from fastapi import Depends
@@ -25,3 +26,5 @@ async def get_async_db() -> AsyncGenerator[AsyncSession, None]:
 SessionDep = Annotated[Session, Depends(get_db)]
 
 SessionDep_async = Annotated[AsyncSession, Depends(get_async_db)]
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

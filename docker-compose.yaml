@@ -3,11 +3,10 @@ version: '1.0'
 services:
   db:
     image: pgvector/pgvector:pg16
-    container_name: knowslog-db
-    restart: always
+    container_name: knowslog-crawler-db
     volumes:
       - app-db-data:/var/lib/postgresql/data/pgdata
-      - ./script/initd:/docker-entrypoint-initdb.d
+      - ./script/initdb:/docker-entrypoint-initdb.d
     env_file: 
       - .env
     environment:
@@ -17,11 +16,6 @@ services:
       - POSTGRES_DB=${POSTGRES_DB?Variable not set}
     ports:
       - "5433:5432"
-    networks:
-      - knowslog-public
 
 volumes:
   app-db-data:
-
-networks:
-  knowslog-public:
