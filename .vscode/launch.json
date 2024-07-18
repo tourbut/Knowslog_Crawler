@@ -5,12 +5,26 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Knowslog_Crawler",
-            "type": "debugpy",
+            "name": "Python : FastAPI",
+            "type": "python",
             "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "envFile": "${workspaceFolder}/.env"
-        }
+            "module": "uvicorn",
+            "args": [
+                "app.main:app",
+                "--reload"
+            ],
+            "jinja": true,
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/backend",
+            "envFile": "${workspaceFolder}/dev.env"
+        },
+        {
+            "name":"Launch npm dev",
+            "type":"node",
+            "request":"launch",
+            "cwd":"${workspaceFolder}/frontend",
+            "runtimeExecutable":"npm",
+            "runtimeArgs":["run", "dev"]
+        },
     ]
 }
