@@ -24,6 +24,7 @@ def _get_meta(url,dom):
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
+    
 def _get_contents(dom):
     parsed_post = []
     
@@ -67,7 +68,6 @@ def get_webpage(url,headers={'User-Agent': 'Mozilla/5.0'}):
     current_date = datetime.now().strftime("%Y-%m-%d")
     contents = _get_contents(dom) 
     return {"title":title,"author":author,"contents":contents,"date":current_date,"url":url}
-
 
 def get_medium(url, txt_html):
     

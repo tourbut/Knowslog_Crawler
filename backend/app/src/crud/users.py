@@ -1,19 +1,26 @@
 from app.models import *
 from app.src.schemas import users as user_schema
 from sqlmodel import Session, select
-from app.src.utils.security import get_password_hash
+from app.src.utils.security import get_password_hash, verify_password
 
-def create_user(*, session: Session, user_create: user_schema.UserCreate) -> User:
-    db_obj = User.model_validate(user_create)
-    session.add(db_obj)
-    session.commit()
-    session.refresh(db_obj)
-    return db_obj
+
+async def get_user_by_email(*, session: Session, email: str) -> User | None:
+    statement = select(User).where(User.email == email)
+    session_user = await session.exec(statement)
+    return session_user.first()
+
+async def authenticate(*, session: Session, email: str, password: str) -> User | None:
+    db_user = await get_user_by_email(session=session, email=email)
+    if not db_user:
+        return None
+    if not await verify_password(password, db_user.password):
+        return None
+    return db_user
 
 async def acreate_user(*, session: Session, user_create: user_schema.UserCreate) -> User:
     
     db_obj = User.model_validate(
-        user_create, update={"password": get_password_hash(user_create.password)})
+        user_create, update={"password": await get_password_hash(user_create.password)})
     
     session.add(db_obj)
     await session.commit()
