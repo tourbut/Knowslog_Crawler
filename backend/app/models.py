@@ -15,6 +15,7 @@ class User(CommonBase, table=True):
     username: str = Field(unique=True, nullable=False)
     password: str = Field(nullable=False)
     email: EmailStr = Field(unique=True, index=True, max_length=255)
+    is_active: bool = Field(default=True)
     
 class UserDetail(CommonBase, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
