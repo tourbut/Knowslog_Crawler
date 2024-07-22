@@ -31,6 +31,7 @@ class UserDetail(CommonBase, table=True):
     
 class Archive(CommonBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
+    user_id: int = Field(foreign_key="user.id")
     category: str = Field(nullable=False)
     collect_ymd: str = Field(nullable=False)
     language: str = Field(nullable=False)
@@ -42,6 +43,7 @@ class Archive(CommonBase, table=True):
 class Refine(CommonBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     archive_id: int = Field(foreign_key="archive.id")
+    user_id: int = Field(foreign_key="user.id")
     refine_ymd: str = Field(nullable=False)
     title: str | None = Field(nullable=True)
     author: str | None = Field(nullable=True)

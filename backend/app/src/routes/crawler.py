@@ -36,5 +36,5 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,us
                                   content=document['contents'],
                                   url=url)
     
-    rst = await crawler_crud.create_archive(session=session, archive=arch)
+    rst = await crawler_crud.create_archive(session=session, archive=arch,user_id=current_user.id)
     return rst
