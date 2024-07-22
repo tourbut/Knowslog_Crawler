@@ -2,20 +2,21 @@
     import { goto } from '$app/navigation';
 	  import { login } from '$lib/apis/user';
     import Error from "$lib/components/Error.svelte";
-    import { user_token } from '$lib/stores';
+    import { user_token,username } from '$lib/stores';
     let error = {detail:[]}
-    let username = ''
+    let email = ''
     let password = ''
   
     const handleSubmit = async () => {
       
       let params = {
-          username: username,
+          username: email,
           password: password
       }
   
       let success_callback = (json) => {
               user_token.set(json.access_token)
+              username.set(json.username)
               goto('/')
           }
   
@@ -27,12 +28,17 @@
     }
   
   </script>
+  {#if $username}
+    <div class="container mx-auto p-4 max-w-md">
+      <h1>{$username}님 반갑습니다.</h1>
+    </div>
+  {:else}
   <div class="form-container">
       <h5 class="form-title">로그인</h5>
       <form method="post" class="form-layout" on:submit|preventDefault={() => {handleSubmit();}}>
         <div>
-          <label for="username" class="form-label">Email</label>
-          <input type="text" class="form-input" id="username" bind:value={username}>
+          <label for="email" class="form-label">Email</label>
+          <input type="text" class="form-input" id="email" bind:value={email}>
         </div>
         <div>
           <label for="password1" class="form-label">PW</label>
@@ -46,3 +52,4 @@
   <div class="container mx-auto p-4 max-w-md">
     <button class="form-button" on:click={() => {goto('/user');}}>회원가입</button>
   </div>
+  {/if}

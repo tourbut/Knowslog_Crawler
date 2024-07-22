@@ -1,6 +1,11 @@
 <script>
     import '../app.css';
-    import { APP_NAME } from '$lib/stores';
+    import { APP_NAME,username,user_token } from '$lib/stores';
+
+    const logout = async () => {
+        username.set("");
+        user_token.set("");
+    }
 </script>
 <svelte:head>
 	<title>
@@ -12,9 +17,16 @@
   <div class="container mx-auto flex justify-between items-center">
     <div class="flex space-x-4">
       <a href="/" class="text-gray-300 hover:text-white">Home</a>
-      <a href="/test" class="text-gray-300 hover:text-white">Test</a>
-      <a href="/user" class="text-gray-300 hover:text-white">User</a>
+      {#if $username}
+      <a href="/Crawler" class="text-gray-300 hover:text-white">Crawler</a>
+      {/if}
     </div>
+    {#if $username}
+    <div class="flex space-x-4">
+      <span class="text-gray-300">{$username}</span>
+      <button class="text-gray-300 hover:text-white" on:click={logout}>Logout</button>
+    </div>
+    {/if}
   </div>
 </nav>
 
