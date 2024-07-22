@@ -11,6 +11,7 @@ class UserPublic(SQLModel):
     id: int
     
 class Token(SQLModel):
+    username: str
     access_token: str
     token_type: str = "bearer"
 

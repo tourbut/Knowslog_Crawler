@@ -1,6 +1,6 @@
 import { API_URL } from '$lib/constants';
+import qs from "qs"
 
-import { sample_store } from '$lib/stores';
 import {get} from "svelte/store"
 
 
@@ -16,6 +16,12 @@ const fastapi = async (operation, url, params, success_callback, failure_callbac
     let method = operation
     let content_type = 'application/json'
     let body = JSON.stringify(params)
+
+    if(operation === 'login') {
+        method = 'post'
+        content_type = 'application/x-www-form-urlencoded'
+        body = qs.stringify(params)
+    }
 
     let _url = API_URL + url
 

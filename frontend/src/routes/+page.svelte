@@ -1,7 +1,8 @@
 <script>
     import { goto } from '$app/navigation';
+	  import { login } from '$lib/apis/user';
     import Error from "$lib/components/Error.svelte";
-  
+    import { user_token } from '$lib/stores';
     let error = {detail:[]}
     let username = ''
     let password = ''
@@ -14,6 +15,7 @@
       }
   
       let success_callback = (json) => {
+              user_token.set(json.access_token)
               goto('/')
           }
   
@@ -21,8 +23,7 @@
               error = json_error
           }
   
-      //await login(params, success_callback, failure_callback);
-      success_callback()
+      await login(params, success_callback, failure_callback);
     }
   
   </script>
@@ -30,7 +31,7 @@
       <h5 class="form-title">로그인</h5>
       <form method="post" class="form-layout" on:submit|preventDefault={() => {handleSubmit();}}>
         <div>
-          <label for="username" class="form-label">ID</label>
+          <label for="username" class="form-label">Email</label>
           <input type="text" class="form-input" id="username" bind:value={username}>
         </div>
         <div>

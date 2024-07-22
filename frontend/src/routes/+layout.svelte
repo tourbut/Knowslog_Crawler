@@ -1,7 +1,6 @@
 <script>
     import '../app.css';
-    import { APP_NAME,sample_store } from '$lib/stores';
-    console.log($sample_store);
+    import { APP_NAME } from '$lib/stores';
 </script>
 <svelte:head>
 	<title>
