@@ -18,7 +18,7 @@
     <div class="flex space-x-4">
       <a href="/" class="text-gray-300 hover:text-white">Home</a>
       {#if $username}
-      <a href="/Crawler" class="text-gray-300 hover:text-white">Crawler</a>
+      <a href="/crawler" class="text-gray-300 hover:text-white">Crawler</a>
       {/if}
     </div>
     {#if $username}
