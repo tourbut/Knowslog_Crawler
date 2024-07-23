@@ -1,7 +1,8 @@
 import { API_URL } from '$lib/constants';
 import qs from "qs"
-
+import { user_token } from './stores';
 import {get} from "svelte/store"
+import { goto } from '$app/navigation';
 
 
 const fastapi = async (operation, url, params, success_callback, failure_callback) => {
@@ -36,6 +37,12 @@ const fastapi = async (operation, url, params, success_callback, failure_callbac
         }
     }
 
+    const access_token = get(user_token)
+    
+    if(access_token) {
+        options.headers['Authorization'] = `Bearer ${access_token}`
+    }
+
     if (method !== 'get') {
         options['body'] = body
     }
@@ -54,6 +61,10 @@ const fastapi = async (operation, url, params, success_callback, failure_callbac
                         if(success_callback) {
                             success_callback(json)
                         }
+                    }else if(operation !== 'login' && response.status === 401) {
+                        user_token.set('')
+                        alert("로그인이 필요합니다.")
+                        goto('/')
                     }
                     else {
                         if(failure_callback) {

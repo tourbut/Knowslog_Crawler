@@ -15,12 +15,12 @@ router = APIRouter()
 
 
 @router.post("/run_crawler", response_model=crawler_schema.Archive)
-async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,user_in: crawler_schema.ArchiveURL) -> Any:
+async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,archive_in: crawler_schema.ArchiveURL) -> Any:
     
-    url = user_in.url
+    url = archive_in.url
     category = ''
     collect_ymd = datetime.now().strftime("%Y%m%d")
-    print(current_user.username)
+    
     if url.find("medium.com") != -1:
         document = get_medium(url=url,txt_html=None)
         category = "Medium"
