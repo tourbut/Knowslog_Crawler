@@ -7,6 +7,15 @@ class UserCreate(SQLModel):
     username: str
     password: str
 
+class UserDetail(SQLModel):
+    name: str 
+    age: int 
+    discord_yn : bool 
+    email_yn : bool 
+    llm_model: str 
+    api_key: str
+    interests: str
+
 class UserPublic(SQLModel):
     id: int
     

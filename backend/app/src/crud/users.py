@@ -17,7 +17,7 @@ async def authenticate(*, session: Session, email: str, password: str) -> User |
         return None
     return db_user
 
-async def acreate_user(*, session: Session, user_create: user_schema.UserCreate) -> User:
+async def create_user(*, session: Session, user_create: user_schema.UserCreate) -> User:
     
     db_obj = User.model_validate(
         user_create, update={"password": await get_password_hash(user_create.password)})
@@ -29,9 +29,8 @@ async def acreate_user(*, session: Session, user_create: user_schema.UserCreate)
 
 
 async def get_detail(*, session: Session, user_id: int) -> UserDetail | None:
-    statement = select(UserDetail).where(UserDetail.user_id == user_id)
-    session_user = await session.exec(statement)
-    return session_user.first()
+    detail = await session.get(UserDetail, user_id)
+    return detail
 
 async def create_detail(*, session: Session, user_detail: user_schema.UserDetail, user_id: int) -> UserDetail:
     
@@ -43,23 +42,16 @@ async def create_detail(*, session: Session, user_detail: user_schema.UserDetail
     return db_obj
 
 async def update_detail(*, session: Session, user_detail: user_schema.UserDetail, user_id: int) -> UserDetail:
-    db_obj = UserDetail.model_validate(user_detail, update={"user_id": user_id})
-    detail = await get_detail(session=session, user_id=user_id)
+    detail = await session.get(UserDetail, user_id)
     
     if not detail:
-        session.add(db_obj)
-        await session.commit()
-        await session.refresh(db_obj)
+        return None
     else:
-        detail.name = db_obj.name
-        detail.age = db_obj.age
-        detail.discord_yn = db_obj.discord_yn
-        detail.email_yn = db_obj.email_yn
-        detail.llm_model = db_obj.llm_model
-        detail.api_key = db_obj.api_key
-        detail.interests = db_obj.interests
+        update_dict = user_detail.model_dump(exclude_unset=True)
+        detail.sqlmodel_update(update_dict)
         detail.update_date = datetime.now()
-
+        session.add(detail)
         await session.commit()
-    
-    return db_obj
+        await session.refresh(detail)
+
+    return detail
