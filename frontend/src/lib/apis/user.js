@@ -14,6 +14,13 @@ export async function login(params, success_callback, failure_callback) {
     await fastapi('login', url, params,success_callback,failure_callback)
 }
 
+export async function get_user(params, success_callback, failure_callback) {
+    
+    let url = "/users/get_user/"
+
+    await fastapi('get', url, params,success_callback,failure_callback)
+}
+
 export async function get_detail(params, success_callback, failure_callback) {
     
     let url = "/users/get_detail/"

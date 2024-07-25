@@ -2,11 +2,12 @@
     import { request_crawler } from "$lib/apis/crawler";
     import Error from "$lib/components/Error.svelte";
     import { user_token,username } from '$lib/stores';
+    import { marked } from 'marked'
     import Spinner from "$lib/components/Spinner.svelte";
     let _url = ''
     let error = {detail:[]}
     let loading = false;
-
+    let markdown = 'Preview'
     const handleSubmit = async () => {
 
       loading = true;
@@ -17,6 +18,7 @@
       let success_callback = (json) => {
             console.log(json)
             loading = false;
+            markdown = json.content
         }
 
       let failure_callback = (json_error) => {
@@ -44,5 +46,8 @@
             <Spinner />
         </div>
     {/if}
-
+</div>
+<div>
+    <h5 class="form-title">미리보기</h5>
+<div class='prose'>{@html marked(markdown)}</div>
 </div>

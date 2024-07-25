@@ -2,6 +2,7 @@
     import { goto } from '$app/navigation';
 	  import { login } from '$lib/apis/user';
     import Error from "$lib/components/Error.svelte";
+    import { Button, GradientButton } from 'flowbite-svelte';
     import { user_token,username } from '$lib/stores';
     let error = {detail:[]}
     let email = ''
@@ -44,12 +45,12 @@
           <label for="password1" class="form-label">PW</label>
           <input type="password" class="form-input" id="password1" bind:value={password}>
         </div>
-        <button type="submit" class="form-button">로그인</button>
+        <Button color="alternative" type="submit" class="form-button">로그인</Button>
         <Error error={error} />
       </form>
   </div>
   
   <div class="container mx-auto p-4 max-w-md">
-    <button class="form-button" on:click={() => {goto('/user');}}>회원가입</button>
+    <GradientButton  color="purpleToPink" class="form-button" on:click={() => {goto('/user');}}>회원가입</GradientButton >
   </div>
   {/if}

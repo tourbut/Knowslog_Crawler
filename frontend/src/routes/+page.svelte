@@ -1,5 +1,5 @@
 <script>
-    import { username } from '$lib/stores';
+  import { username } from '$lib/stores';
   import { Alert } from 'flowbite-svelte';
 </script>
 {#if $username}
