@@ -1,6 +1,6 @@
 import { API_URL } from '$lib/constants';
 import qs from "qs"
-import { user_token } from './stores';
+import { user_token } from '$lib/stores';
 import {get} from "svelte/store"
 import { goto } from '$app/navigation';
 
