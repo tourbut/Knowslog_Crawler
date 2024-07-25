@@ -19,7 +19,6 @@ class User(CommonBase, table=True):
     
 class UserDetail(CommonBase, table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
-    id: int | None = Field(default=None, primary_key=True)
     name: str = Field(nullable=False)
     age: int = Field(nullable=False)
     discord_yn : bool = Field(default=False)
@@ -27,13 +26,11 @@ class UserDetail(CommonBase, table=True):
     llm_model: str | None = Field(nullable=True)
     api_key: str | None = Field(nullable=True)
     interests: str | None = Field(nullable=True)
-    json_data: Optional[dict] = Field(nullable=True, sa_type=JSONB)
     
 class Archive(CommonBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
     category: str = Field(nullable=False)
-    collect_ymd: str = Field(nullable=False)
     language: str = Field(nullable=False)
     title: str | None = Field(nullable=True)
     author: str | None = Field(nullable=True)
@@ -44,7 +41,6 @@ class Refine(CommonBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     archive_id: int = Field(foreign_key="archive.id")
     user_id: int = Field(foreign_key="user.id")
-    refine_ymd: str = Field(nullable=False)
     title: str | None = Field(nullable=True)
     author: str | None = Field(nullable=True)
     content: str = Field(nullable=False)
