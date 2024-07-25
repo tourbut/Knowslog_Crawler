@@ -23,7 +23,7 @@
     }
 
     let success_callback = (json) => {
-            goto('/')
+            goto('/login')
         }
 
     let failure_callback = (json_error) => {
