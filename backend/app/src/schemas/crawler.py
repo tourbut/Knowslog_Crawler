@@ -7,7 +7,6 @@ class ArchiveURL(SQLModel):
 
 class Archive(SQLModel):
     category: str
-    collect_ymd: str 
     language: str
     title: str 
     author: str 

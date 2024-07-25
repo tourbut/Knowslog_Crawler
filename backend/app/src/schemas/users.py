@@ -18,6 +18,7 @@ class UserDetail(SQLModel):
 
 class UserPublic(SQLModel):
     id: int
+    username:str
     
 class Token(SQLModel):
     username: str

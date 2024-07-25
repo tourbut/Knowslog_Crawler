@@ -19,7 +19,6 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
     
     url = archive_in.url
     category = ''
-    collect_ymd = datetime.now().strftime("%Y%m%d")
     
     if url.find("medium.com") != -1:
         document = get_medium(url=url,txt_html=None)
@@ -29,7 +28,6 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
         category = "Webpage"
     
     arch = crawler_schema.Archive(category=category,
-                                  collect_ymd=collect_ymd,
                                   language="eng",
                                   title=document['title'],
                                   author=document['author'],

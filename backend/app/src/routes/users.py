@@ -51,6 +51,8 @@ async def login(
     return user_schema.Token(access_token=await security.create_access_token(user.id, expires_delta=access_token_expires),
                              username=user.username)
 
+
+
 @router.get("/get_detail", response_model=user_schema.UserDetail)
 async def get_detail(*, session: SessionDep_async, current_userdetail: CurrentUserDetail) -> Any:
     """
@@ -59,7 +61,15 @@ async def get_detail(*, session: SessionDep_async, current_userdetail: CurrentUs
     
     #user = await user_crud.get_detail(session=session, user_id=current_user.id)
     return current_userdetail
-    
+
+@router.get("/get_user", response_model=user_schema.UserPublic)
+async def get_user(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
+    """
+    Get User
+    """
+
+    return current_user
+
 @router.post("/create_detail")
 async def create_detail(*, session: SessionDep_async, current_user: CurrentUser, detail_in: user_schema.UserDetail) -> Any:
     """
