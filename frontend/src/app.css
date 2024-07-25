@@ -2,11 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* @layer base {
+    * { --tw-ring-color: rgb(0 0 0 / 0)!important; } 
+} */
+
 @layer components {
     .form-container {
       @apply container mx-auto p-4 max-w-md;
     }
-  
+    .form-inline {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .form-input-inline {
+        margin: 0;
+    }
+    
     .form-title {
       @apply text-xl font-medium my-4 border-b pb-2;
     }
