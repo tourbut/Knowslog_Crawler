@@ -1,11 +1,10 @@
 <script>
     import { goto } from '$app/navigation';
-    import Error from "$lib/components/Error.svelte";
     import { create_detail, update_detail,get_detail } from "$lib/apis/user";
     import LlmCombo from '$lib/components/detail/LLM_Combo.svelte';
     import InterestsInput from '$lib/components/detail/InterestsInput.svelte';
     import { onMount } from 'svelte';
-
+    import addToast from '$lib/apis/common';
     let error = {detail:[]}
     let name = ""
     let age = 0
@@ -35,6 +34,7 @@
 
       let failure_callback = (json_error) => {
         error = json_error
+      addToast('error',error.detail)
       }
 
       await get_detail(params,success_callback, failure_callback)
@@ -66,6 +66,7 @@
 
         let failure_callback = (json_error) => {
             error = json_error
+      addToast('error',error.detail)
         }
 
         if (button.name == "btn_create") {
@@ -106,6 +107,5 @@
       {:else}
         <button name="btn_create" type="submit" class="form-button">저장</button>
       {/if}
-      <Error error={error} />
     </form>
 </div> 

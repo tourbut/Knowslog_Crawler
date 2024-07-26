@@ -1,8 +1,7 @@
 <script>
   import { goto } from '$app/navigation';
-  import Error from "$lib/components/Error.svelte";
   import { post_user } from "$lib/apis/user";
-
+  import { addToast } from '$lib/apis/common';
   let error = {detail:[]}
   let username = ''
   let password1 = ''
@@ -28,6 +27,7 @@
 
     let failure_callback = (json_error) => {
             error = json_error
+      addToast('error',error.detail)
         }
 
     await post_user(params, success_callback, failure_callback);
@@ -55,6 +55,5 @@
         <input type="text" class="form-input" id="email" bind:value={email}>
       </div>
       <button type="submit" class="form-button">생성하기</button>
-      <Error error={error} />
     </form>
 </div>

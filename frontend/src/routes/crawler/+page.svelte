@@ -1,9 +1,10 @@
 <script>
     import { request_crawler } from "$lib/apis/crawler";
-    import Error from "$lib/components/Error.svelte";
     import { user_token,username } from '$lib/stores';
     import { marked } from 'marked'
     import Spinner from "$lib/components/Spinner.svelte";
+    import { addToast } from "$lib/apis/common";
+
     let _url = ''
     let error = {detail:[]}
     let loading = false;
@@ -23,6 +24,7 @@
 
       let failure_callback = (json_error) => {
             error = json_error
+      addToast('error',error.detail)
         }
       console.log(_url)
       await request_crawler(params, success_callback, failure_callback);
@@ -38,7 +40,6 @@
         <input type="text" class="form-input" id="url" bind:value={_url}>
       </div>
       <button type="submit" class="form-button">수집</button>
-      <Error error={error} />
     </form>
 
     {#if loading}
