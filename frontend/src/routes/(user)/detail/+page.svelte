@@ -4,7 +4,7 @@
     import LlmCombo from '$lib/components/detail/LLM_Combo.svelte';
     import InterestsInput from '$lib/components/detail/InterestsInput.svelte';
     import { onMount } from 'svelte';
-    import addToast from '$lib/apis/common';
+    import { addToast } from '$lib/apis/common';
     let error = {detail:[]}
     let name = ""
     let age = 0
