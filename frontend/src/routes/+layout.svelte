@@ -1,6 +1,6 @@
 <script>
     import '../app.css';
-    import Navigation from '$lib/components/Navigation.svelte';
+    import Navigation from '$lib/components/common/Navigation.svelte';
     import { APP_NAME,user_token } from '$lib/stores';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';

@@ -1,8 +1,9 @@
 <script>
+    import { Button, Spinner } from "flowbite-svelte";
     import { request_crawler } from "$lib/apis/crawler";
     import { user_token,username } from '$lib/stores';
     import { marked } from 'marked'
-    import Spinner from "$lib/components/Spinner.svelte";
+    
     import { addToast } from "$lib/apis/common";
 
     let _url = ''
@@ -39,14 +40,13 @@
         <label for="url" class="form-label">URL</label>
         <input type="text" class="form-input" id="url" bind:value={_url}>
       </div>
-      <button type="submit" class="form-button">수집</button>
+      <div class="flex flex-wrap items-center gap-2">
+        <Button type="submit">
+          <Spinner class="me-3" size="4" color="white" />
+          Start!
+        </Button>
+      </div>
     </form>
-
-    {#if loading}
-        <div class="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-75">
-            <Spinner />
-        </div>
-    {/if}
 </div>
 <div>
     <h5 class="form-title">미리보기</h5>
