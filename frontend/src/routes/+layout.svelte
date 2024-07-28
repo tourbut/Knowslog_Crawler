@@ -1,6 +1,7 @@
 <script>
     import '../app.css';
     import Navigation from '$lib/components/common/Navigation.svelte';
+    import Footer from '$lib/components/common/Footer.svelte';
     import { APP_NAME,user_token } from '$lib/stores';
     import { goto } from '$app/navigation';
     import { onMount } from 'svelte';
@@ -23,3 +24,5 @@
 <slot></slot>
 
 <Toasts />
+
+<Footer />
