@@ -26,3 +26,8 @@ export default {
     }
   }
 };
+
+const config = {
+  darkMode: 'class'
+  // ...
+};
