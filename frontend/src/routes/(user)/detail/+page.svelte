@@ -1,7 +1,7 @@
 <script>
     import { goto } from '$app/navigation';
-    import { update_detail,get_user } from "$lib/apis/user";
-    import LlmCombo from '$lib/components/detail/LLM_Combo.svelte';
+    import { update_detail,get_userdetail } from "$lib/apis/user";
+    import { Input, Label, Toggle, Button, Checkbox, A } from 'flowbite-svelte';
     import InterestsInput from '$lib/components/detail/InterestsInput.svelte';
     import { onMount } from 'svelte';
     import { addToast } from '$lib/apis/common';
@@ -33,7 +33,7 @@
       addToast('error',error.detail)
       }
 
-      await get_user(params,success_callback, failure_callback)
+      await get_userdetail(params,success_callback, failure_callback)
     }
 
     onMount(async () => {
@@ -41,60 +41,54 @@
     })
 
 
-    async function handleSubmit(event) {
-      event.preventDefault();
-
-      const button = event.submitter;
-      
+    const handleSubmit = async () => {
       let params = {
-            "name": name,
-            "age": age,
-            "discord_yn": discord_yn,
-            "email_yn": email_yn,
-            "interests": interests.join('|'),
+          "name": name,
+          "age": age,
+          "discord_yn": discord_yn,
+          "email_yn": email_yn,
+          "interests": interests.join('|'),
         }
 
         let success_callback = (json) => {
+          addToast('info',"수정이 완료되었습니다.")
           get_data()
         }
 
         let failure_callback = (json_error) => {
-            error = json_error
-      addToast('error',error.detail)
+          error = json_error
+          addToast('error',error.detail)
         }
-
-        if (button.name == "btn_create") {
-          await create_detail(params, success_callback, failure_callback);
-        } else if (button.name == "btn_update") {
           await update_detail(params, success_callback, failure_callback);
-        }
       }
 
 </script>
-<div class="form-container">
-    <h5 class="form-title">유저 개인정보</h5>
-    <form method="post" class="form-layout" on:submit= {handleSubmit}>
-      <div>
-        <label for="name" class="form-label">이름</label>
-        <input type="text" class="form-input" id="name" bind:value={name}>
-        <label for="age" class="form-label">나이</label>
-        <input type="number" class="form-input" id="age" bind:value={age} min="0">
-      </div>
-      <div class="form-inline">
-        <label for="discord_yn" class="form-label">디스코드 수신여부</label>
-        <input type="checkbox" class="form-input-inline" id="discord_yn" bind:checked={discord_yn}>
-        <label for="email_yn" class="form-label">이메일 수신여부</label>
-        <input type="checkbox" class="form-input-inline" id="email_yn" bind:checked={email_yn}>
-      </div>
-      <div>
-        <label for="interests" class="form-label">관심사</label>
 
-        <InterestsInput bind:interests={interests} /> <!-- Use the InterestsInput component -->
-      </div>
-      {#if data_loaded}
-        <button name="btn_update" type="submit" class="form-button">수정</button>
-      {:else}
-        <button name="btn_create" type="submit" class="form-button">저장</button>
-      {/if}
-    </form>
-</div> 
+<div class="form-container">
+  <form method="post" class="form-layout">
+  
+  <div class="grid gap-6 mb-6 md:grid-cols-2">
+    <div>
+      <Label for="name" class="mb-2">이름</Label>
+      <Input type="text" id="name" placeholder="홍길동" required bind:value={name}/>
+    </div>
+    <div>
+      <Label for="age" class="mb-2">나이</Label>
+      <Input type="number" id="age" placeholder=0 required bind:value={age}/>
+    </div>
+  </div>
+  <div class="grid gap-6 mb-6 md:grid-cols-2">
+    <div>
+      <Toggle bind:checked={discord_yn}>Discord 수신여부</Toggle>
+    </div>
+    <div>
+      <Toggle bind:checked={email_yn}>Email 수신여부</Toggle>
+    </div>
+  </div>
+  <div>
+    <InterestsInput bind:interests={interests} />
+  </div>
+
+  <Button on:click={handleSubmit}>수정</Button>
+</form>
+</div>

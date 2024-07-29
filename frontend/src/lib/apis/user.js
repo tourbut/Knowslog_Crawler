@@ -21,6 +21,13 @@ export async function get_user(params, success_callback, failure_callback) {
     await fastapi('get', url, params,success_callback,failure_callback)
 }
 
+export async function get_userdetail(params, success_callback, failure_callback) {
+    
+    let url = "/users/get_userdetail/"
+
+    await fastapi('get', url, params,success_callback,failure_callback)
+}
+
 export async function update_detail(params, success_callback, failure_callback) {
         
         let url = "/users/update_detail/"

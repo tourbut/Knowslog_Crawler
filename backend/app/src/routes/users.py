@@ -60,6 +60,14 @@ async def get_user(*, session: SessionDep_async, current_user: CurrentUser) -> A
 
     return current_user
 
+@router.get("/get_userdetail", response_model=user_schema.UserDetail)
+async def get_user(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
+    """
+    Get User
+    """
+
+    return current_user
+
 @router.put("/update_detail/",response_model=user_schema.UserDetail)
 async def update_detail(*, session: SessionDep_async, current_user: CurrentUser, detail_in: user_schema.UserDetail) -> Any:
     """
