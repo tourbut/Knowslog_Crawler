@@ -33,7 +33,7 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
                                   author=document['author'],
                                   content=document['contents'],
                                   url=url,
-                                  dom=dom)
+                                  dom=dom.prettify())
     
     rst = await crawler_crud.create_archive(session=session, archive=arch,user_id=current_user.id)
     return rst
