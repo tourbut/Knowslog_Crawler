@@ -1,12 +1,23 @@
 <script>
-    import { Toast } from 'flowbite-svelte';
-    import { ExclamationCircleSolid,CloseCircleSolid,CheckCircleSolid } from 'flowbite-svelte-icons';
-    import { toasts } from '$lib/stores';
-    import { removeToast } from '$lib/apis/common';
+  import { Toast } from 'flowbite-svelte';
+  import { ExclamationCircleSolid,CloseCircleSolid,CheckCircleSolid } from 'flowbite-svelte-icons';
+  import { toasts } from '$lib/stores';
+  import { removeToast } from '$lib/apis/common';
 
-    function handleDismiss(id) {
-      removeToast(id);
+  function handleDismiss(id) {
+    removeToast(id);
+  }
+
+  let lastToast;
+
+  $: {
+    if ($toasts) {
+      if ($toasts.length > 0) {
+        lastToast = $toasts[$toasts.length - 1];
+        setTimeout(() => removeToast(lastToast.id), 5000);
+      }
     }
+  }
 
 </script>
 {#if $toasts}
