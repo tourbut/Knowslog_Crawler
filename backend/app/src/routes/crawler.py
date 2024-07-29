@@ -21,10 +21,10 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
     category = ''
     
     if url.find("medium.com") != -1:
-        document = get_medium(url=url,txt_html=None)
+        document,dom = get_medium(url=url,txt_html=None)
         category = "Medium"
     else :
-        document = get_webpage(url=url)
+        document,dom = get_webpage(url=url)
         category = "Webpage"
     
     arch = crawler_schema.Archive(category=category,
@@ -32,7 +32,8 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
                                   title=document['title'],
                                   author=document['author'],
                                   content=document['contents'],
-                                  url=url)
+                                  url=url,
+                                  dom=dom)
     
     rst = await crawler_crud.create_archive(session=session, archive=arch,user_id=current_user.id)
     return rst

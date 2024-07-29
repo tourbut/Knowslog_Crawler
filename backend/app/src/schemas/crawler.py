@@ -12,3 +12,4 @@ class Archive(SQLModel):
     author: str 
     content: str 
     url : str 
+    dom : str

@@ -67,14 +67,14 @@ def get_webpage(url,headers={'User-Agent': 'Mozilla/5.0'}):
     url,title,author = _get_meta(url,dom)
     current_date = datetime.now().strftime("%Y-%m-%d")
     contents = _get_contents(dom) 
-    return {"title":title,"author":author,"contents":contents,"date":current_date,"url":url}
+    return {"title":title,"author":author,"contents":contents,"date":current_date,"url":url},dom
 
 def get_medium(url, txt_html):
     
     parser = MediumParser(url=url,
                           is_image_download = False,
                           ssl_verify = settings.SSL_VERIFY)
-    
+    _dom = parser.get_dom(url)
     _rtn = parser.parse(txt_html=txt_html,is_save=False)
     
-    return _rtn
+    return _rtn,_dom

@@ -36,6 +36,7 @@ class Archive(CommonBase, table=True):
     author: str | None = Field(nullable=True)
     content: str = Field(nullable=False)
     url : str = Field(nullable=False)
+    dom: str | None = Field(nullable=True)
 
 class Refine(CommonBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
