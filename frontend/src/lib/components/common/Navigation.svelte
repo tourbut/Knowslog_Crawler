@@ -2,7 +2,6 @@
     import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
     import { APP_NAME,username,user_token } from '$lib/stores';
     import { DarkMode } from 'flowbite-svelte';
-    import { goto } from '$app/navigation';
     const logout = async () => {
         username.set("");
         user_token.set("");
@@ -20,7 +19,8 @@
         <NavLi href="/">Home</NavLi>
         {#if $username}
         <NavLi href="/crawler">Crawler</NavLi>
-        <NavLi href="/detail">개인정보</NavLi>
+        <NavLi href="/chat">Chat</NavLi>
+        <NavLi href="/detail">Settings</NavLi>
         <NavLi on:click={logout}>Logout</NavLi>
         {/if}
     </NavUl>
