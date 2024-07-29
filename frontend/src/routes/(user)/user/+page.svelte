@@ -80,10 +80,10 @@
   </div>
   <div class="grid gap-6 mb-6 md:grid-cols-2">
     <div>
-      <Toggle checked={discord_yn}>Discord 수신여부</Toggle>
+      <Toggle bind:checked={discord_yn}>Discord 수신여부</Toggle>
     </div>
     <div>
-      <Toggle checked={email_yn}>Email 수신여부</Toggle>
+      <Toggle bind:checked={email_yn}>Email 수신여부</Toggle>
     </div>
   </div>
   <div>
