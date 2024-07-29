@@ -74,7 +74,7 @@ def get_medium(url, txt_html):
     parser = MediumParser(url=url,
                           is_image_download = False,
                           ssl_verify = settings.SSL_VERIFY)
-    _dom = parser.get_dom(url)
-    _rtn = parser.parse(txt_html=txt_html,is_save=False)
+
+    _rtn,_dom = parser.parse(txt_html=txt_html,is_savefile=False,is_get_dom=True)
     
     return _rtn,_dom
