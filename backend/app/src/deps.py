@@ -15,7 +15,7 @@ from pydantic import ValidationError
 
 from app.core.config import settings
 from app.src.utils import security
-from app.models import User, UserDetail
+from app.models import User
 from app.src.schemas.users import TokenPayload
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
@@ -58,24 +58,4 @@ async def get_current_user(session: SessionDep_async, token: TokenDep) -> User:
         raise HTTPException(status_code=400, detail="Inactive user")
     return user
 
-async def get_current_userdetail(session: SessionDep_async, token: TokenDep) -> User:
-    try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[security.ALGORITHM]
-        )
-        token_data = TokenPayload(**payload)
-    except (InvalidTokenError, ValidationError):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Could not validate credentials",
-        )
-    
-    user_detail = await session.get(UserDetail, token_data.sub)
-    
-    if not user_detail:
-        raise HTTPException(status_code=404, detail="사용자 개인 정보를 입력해주세요.")
-    
-    return user_detail
-
 CurrentUser = Annotated[User, Depends(get_current_user)]
-CurrentUserDetail = Annotated[UserDetail, Depends(get_current_userdetail)]

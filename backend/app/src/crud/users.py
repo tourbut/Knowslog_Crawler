@@ -28,21 +28,8 @@ async def create_user(*, session: Session, user_create: user_schema.UserCreate) 
     return db_obj
 
 
-async def get_detail(*, session: Session, user_id: int) -> UserDetail | None:
-    detail = await session.get(UserDetail, user_id)
-    return detail
-
-async def create_detail(*, session: Session, user_detail: user_schema.UserDetail, user_id: int) -> UserDetail:
-    
-    db_obj = UserDetail.model_validate(user_detail, update={"user_id": user_id})
-    
-    session.add(db_obj)
-    await session.commit()
-    await session.refresh(db_obj)
-    return db_obj
-
-async def update_detail(*, session: Session, user_detail: user_schema.UserDetail, user_id: int) -> UserDetail:
-    detail = await session.get(UserDetail, user_id)
+async def update_detail(*, session: Session, user_detail: user_schema.UserDetail, user_id: int) -> User:
+    detail = await session.get(User, user_id)
     
     if not detail:
         return None

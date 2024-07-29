@@ -21,21 +21,6 @@ export async function get_user(params, success_callback, failure_callback) {
     await fastapi('get', url, params,success_callback,failure_callback)
 }
 
-export async function get_detail(params, success_callback, failure_callback) {
-    
-    let url = "/users/get_detail/"
-
-    await fastapi('get', url, params,success_callback,failure_callback)
-}
-
-export async function create_detail(params, success_callback, failure_callback) {
-        
-    let url = "/users/create_detail/"
-
-    await fastapi('post', url, params,success_callback,failure_callback)
-}
-
-
 export async function update_detail(params, success_callback, failure_callback) {
         
         let url = "/users/update_detail/"

@@ -7,7 +7,7 @@ from psycopg import DatabaseError
 from app.src.utils import security
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app.src.deps import SessionDep_async,CurrentUser,CurrentUserDetail
+from app.src.deps import SessionDep_async,CurrentUser
 from app.src.crud import users as user_crud
 from app.src.schemas import users as user_schema
 
@@ -52,16 +52,6 @@ async def login(
                              username=user.username)
 
 
-
-@router.get("/get_detail", response_model=user_schema.UserDetail)
-async def get_detail(*, session: SessionDep_async, current_userdetail: CurrentUserDetail) -> Any:
-    """
-    Get User detail
-    """
-    
-    #user = await user_crud.get_detail(session=session, user_id=current_user.id)
-    return current_userdetail
-
 @router.get("/get_user", response_model=user_schema.UserPublic)
 async def get_user(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
     """
@@ -69,15 +59,6 @@ async def get_user(*, session: SessionDep_async, current_user: CurrentUser) -> A
     """
 
     return current_user
-
-@router.post("/create_detail")
-async def create_detail(*, session: SessionDep_async, current_user: CurrentUser, detail_in: user_schema.UserDetail) -> Any:
-    """
-    Create User detail
-    """
-    
-    user = await user_crud.create_detail(session=session, user_detail=detail_in, user_id=current_user.id)
-    return user
 
 @router.put("/update_detail/",response_model=user_schema.UserDetail)
 async def update_detail(*, session: SessionDep_async, current_user: CurrentUser, detail_in: user_schema.UserDetail) -> Any:

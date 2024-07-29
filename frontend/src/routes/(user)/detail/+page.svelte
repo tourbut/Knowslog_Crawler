@@ -1,6 +1,6 @@
 <script>
     import { goto } from '$app/navigation';
-    import { create_detail, update_detail,get_detail } from "$lib/apis/user";
+    import { update_detail,get_user } from "$lib/apis/user";
     import LlmCombo from '$lib/components/detail/LLM_Combo.svelte';
     import InterestsInput from '$lib/components/detail/InterestsInput.svelte';
     import { onMount } from 'svelte';
@@ -10,8 +10,6 @@
     let age = 0
     let discord_yn = false
     let email_yn = false
-    let llm_model = ""
-    let api_key = ""
     let interests = []
     let data_loaded = false
 
@@ -26,8 +24,6 @@
         age = json.age
         discord_yn = json.discord_yn
         email_yn = json.email_yn
-        llm_model = json.llm_model
-        api_key = json.api_key
         interests = json.interests ? json.interests.split('|') : []
 
       }
@@ -37,7 +33,7 @@
       addToast('error',error.detail)
       }
 
-      await get_detail(params,success_callback, failure_callback)
+      await get_user(params,success_callback, failure_callback)
     }
 
     onMount(async () => {
@@ -55,8 +51,6 @@
             "age": age,
             "discord_yn": discord_yn,
             "email_yn": email_yn,
-            "llm_model": llm_model,
-            "api_key": api_key,
             "interests": interests.join('|'),
         }
 
@@ -93,13 +87,8 @@
         <input type="checkbox" class="form-input-inline" id="email_yn" bind:checked={email_yn}>
       </div>
       <div>
-        <label for="llm_model" class="form-label">LLM 모델</label>
-        <LlmCombo bind:llm_model={llm_model} /> <!-- Use the LLM model select component -->
-            
-        <label for="api_key" class="form-label">API 키</label>
-        <input type="password" class="form-input" id="api_key" bind:value={api_key}>
         <label for="interests" class="form-label">관심사</label>
-        
+
         <InterestsInput bind:interests={interests} /> <!-- Use the InterestsInput component -->
       </div>
       {#if data_loaded}
