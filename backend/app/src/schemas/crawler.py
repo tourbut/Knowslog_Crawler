@@ -4,6 +4,8 @@ from sqlmodel import Session, select
 
 class ArchiveURL(SQLModel):
     url: str
+    auto_translate: bool
+    auto_summarize: bool
 
 class Archive(SQLModel):
     category: str
