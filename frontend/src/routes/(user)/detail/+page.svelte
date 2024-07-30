@@ -4,7 +4,7 @@
     import { Input, Label, Toggle, Button, Checkbox, A } from 'flowbite-svelte';
     import InterestsInput from '$lib/components/detail/InterestsInput.svelte';
     import { onMount } from 'svelte';
-    import { addToast } from '$lib/apis/common';
+    import { addToast } from '$lib/common';
     let error = {detail:[]}
     let name = ""
     let age = 0

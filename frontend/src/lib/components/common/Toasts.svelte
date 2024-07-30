@@ -2,7 +2,7 @@
   import { Toast } from 'flowbite-svelte';
   import { ExclamationCircleSolid,CloseCircleSolid,CheckCircleSolid } from 'flowbite-svelte-icons';
   import { toasts } from '$lib/stores';
-  import { removeToast } from '$lib/apis/common';
+  import { removeToast } from '$lib/common.js';
 
   function handleDismiss(id) {
     removeToast(id);

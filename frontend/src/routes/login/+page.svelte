@@ -2,7 +2,7 @@
   import { Card, Button, Label, Input, Checkbox } from 'flowbite-svelte';
   import { goto } from '$app/navigation';
   import { login } from '$lib/apis/user';
-  import { addToast } from '$lib/apis/common';
+  import { addToast } from '$lib/common';
   import { user_token,username } from '$lib/stores';
   let error = {detail:[]}
   let email = ''

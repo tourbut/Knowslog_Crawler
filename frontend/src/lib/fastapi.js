@@ -64,7 +64,7 @@ const fastapi = async (operation, url, params, success_callback, failure_callbac
                     }else if(operation !== 'login' && response.status === 401) {
                         user_token.set('')
                         alert("로그인이 필요합니다.")
-                        goto('/')
+                        goto('/login')
                     }
                     else {
                         if(failure_callback) {

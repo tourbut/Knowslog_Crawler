@@ -1,42 +1,41 @@
 <script>
-    import { Button, Spinner } from "flowbite-svelte";
-    import { Heading, P, Hr} from 'flowbite-svelte';
-    import { Label, Input, InputAddon, ButtonGroup, Checkbox } from 'flowbite-svelte';
-    import { request_crawler } from "$lib/apis/crawler";
-    import { user_token,username } from '$lib/stores';
-    import { marked } from 'marked'
-    
-    import { addToast } from "$lib/apis/common";
+  import { Button, Spinner } from "flowbite-svelte";
+  import { Heading, P, Hr} from 'flowbite-svelte';
+  import { Label, Input, InputAddon, ButtonGroup, Checkbox } from 'flowbite-svelte';
+  import { request_crawler } from "$lib/apis/crawler";
+  import { user_token,username } from '$lib/stores';
+  import { marked } from 'marked'
+  import { addToast } from '$lib/common';
 
-    let _url = ''
-    let error = {detail:[]}
-    let loading = false;
-    let markdown = "Content will be displayed here"
+  let _url = ''
+  let error = {detail:[]}
+  let loading = false;
+  let markdown = "Content will be displayed here"
 
-    const btn_start = async () => {
+  const btn_start = async () => {
 
-      if (loading == true) {
-        addToast('warning','Already Crawling')
-        return
+    if (loading == true) {
+      addToast('warning','Already Crawling')
+      return
+    }
+
+    loading = true;
+    let params = {
+        url: _url
+    }
+
+    let success_callback = (json) => {
+      addToast('info','Crawling Success')
+          loading = false;
+          markdown = json.content
       }
 
-      loading = true;
-      let params = {
-          url: _url
+    let failure_callback = (json_error) => {
+          error = json_error
+      addToast('error',error.detail)
       }
-
-      let success_callback = (json) => {
-        addToast('info','Crawling Success')
-            loading = false;
-            markdown = json.content
-        }
-
-      let failure_callback = (json_error) => {
-            error = json_error
-        addToast('error',error.detail)
-        }
-      console.log(_url)
-      await request_crawler(params, success_callback, failure_callback);
+    console.log(_url)
+    await request_crawler(params, success_callback, failure_callback);
   };
   
 </script>

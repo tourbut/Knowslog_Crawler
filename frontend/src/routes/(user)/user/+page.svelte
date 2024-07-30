@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { post_user} from "$lib/apis/user";
   import InterestsInput from '$lib/components/detail/InterestsInput.svelte';
-  import { addToast } from '$lib/apis/common';
+  import { addToast } from '$lib/common';
   let error = {detail:[]}
   //User info
   let username = ''
