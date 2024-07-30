@@ -3,7 +3,7 @@
   import { goto } from '$app/navigation';
   import { login } from '$lib/apis/user';
   import { addToast } from '$lib/common';
-  import { user_token,username } from '$lib/stores';
+  import { user_token,username,is_admin } from '$lib/stores';
   let error = {detail:[]}
   let email = ''
   let password = ''
@@ -18,6 +18,7 @@
     let success_callback = (json) => {
       user_token.set(json.access_token)
       username.set(json.username)
+      is_admin.set(json.is_admin)
       goto('/')
     }
 
