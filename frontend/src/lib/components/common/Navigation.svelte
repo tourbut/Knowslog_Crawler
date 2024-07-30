@@ -1,6 +1,8 @@
 <script>
-    import { Navbar, NavBrand, NavLi, NavUl, NavHamburger } from 'flowbite-svelte';
-    import { APP_NAME,username,user_token } from '$lib/stores';
+    import { Navbar, NavBrand, NavLi, NavUl, NavHamburger} from 'flowbite-svelte';
+    import { Dropdown, DropdownItem, DropdownDivider} from 'flowbite-svelte';
+    import { ChevronDownOutline } from 'flowbite-svelte-icons';
+    import { APP_NAME,username,user_token,is_admin } from '$lib/stores';
     import { DarkMode } from 'flowbite-svelte';
     const logout = async () => {
         username.set("");
@@ -20,8 +22,19 @@
         {#if $username}
         <NavLi href="/crawler">Crawler</NavLi>
         <NavLi href="/chat">Chat</NavLi>
-        <NavLi href="/detail">Settings</NavLi>
-        <NavLi on:click={logout}>Logout</NavLi>
+        <NavLi class="cursor-pointer">
+            Settings<ChevronDownOutline class="w-6 h-6 ms-2 text-primary-800 dark:text-white inline" />
+        </NavLi>    
+        <Dropdown class="w-44 z-20">
+            <DropdownItem href="/detail">개인정보</DropdownItem>
+            <DropdownItem href="/settings">LLM설정</DropdownItem>
+            <DropdownItem href="/usage">사용량조회</DropdownItem>
+            <DropdownDivider />
+            {#if $is_admin}
+            <DropdownItem href="/admin">Admin</DropdownItem>
+            {/if}
+            <DropdownItem on:click={logout}>Logout</DropdownItem>
+        </Dropdown>
         {/if}
     </NavUl>
     <div class="ms-auto flex items-center text-gray-500 dark:text-gray-400 sm:order-2">

@@ -26,6 +26,7 @@ class UserPublic(SQLModel):
     
 class Token(SQLModel):
     username: str
+    is_admin: bool = False
     access_token: str
     token_type: str = "bearer"
 
