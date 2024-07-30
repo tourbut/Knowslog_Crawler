@@ -22,6 +22,7 @@ class UserDetail(SQLModel):
 class UserPublic(SQLModel):
     id: int
     username:str
+    is_active: bool
     
 class Token(SQLModel):
     username: str

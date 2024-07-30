@@ -46,7 +46,6 @@ const fastapi = async (operation, url, params, success_callback, failure_callbac
     if (method !== 'get') {
         options['body'] = body
     }
-
     await fetch(_url, options)
         .then(response => {
             if(response.status === 204) {
