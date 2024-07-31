@@ -29,6 +29,7 @@ class LLM(CommonBase, table=True):
     description: str | None = Field(nullable=True)
     input_price: float = Field(nullable=False)
     output_price: float = Field(nullable=False)
+    is_active: bool = Field(default=True)
 
 class UserAPIKey(CommonBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
