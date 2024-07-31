@@ -6,7 +6,15 @@
     import { onMount } from 'svelte';
     import { addToast } from '$lib/common';
 
-    let table_head=["출처","타입","모델명","설명","Input Price","Output Price","활성화여부"]
+    let table_head={
+      "출처":"string",
+      "타입":"string",
+      "모델명":"string",
+      "설명":"string",
+      "Input Price":"number",
+      "Output Price":"number",
+      "활성화여부":"boolean"
+    }
     let table_body=[]
 
     async function get_data()
@@ -14,8 +22,6 @@
       let params = {}
 
       let success_callback = (json) => {
-        
-        console.log(typeof(json[0].is_active))
         table_body=json
       }
 
@@ -30,11 +36,16 @@
       await get_data()
     })
 
+    onsubmit = async (event) => {
+      event.preventDefault();
+      console.log(event.detail)
+    }
+
 </script>
 <div class="form-tabs">
     <Tabs>
       <TabItem open title="모델">
-        <Table table_head={table_head} bind:table_body={table_body} is_editable={true}/>
+        <Table btn_click={onsubmit} table_head={table_head} bind:table_body={table_body} is_editable={true}/>
       </TabItem>
     </Tabs>
     
