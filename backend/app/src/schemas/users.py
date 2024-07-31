@@ -1,6 +1,5 @@
 from app.models import *
 from sqlmodel import SQLModel
-from sqlmodel import Session, select
 
 class UserCreate(SQLModel):
     email: EmailStr | None = Field(default=None, max_length=255)

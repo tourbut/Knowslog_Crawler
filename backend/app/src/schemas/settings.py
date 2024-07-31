@@ -1,6 +1,5 @@
 from app.models import *
 from sqlmodel import SQLModel
-from sqlmodel import Session, select
 
 class Setting_LLM(SQLModel):
     source: str
