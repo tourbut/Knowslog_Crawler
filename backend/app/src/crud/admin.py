@@ -11,7 +11,22 @@ async def create_llm(*, session: Session, llm_create: admin_schema.LLMCreate) ->
     await session.refresh(db_obj)
     return db_obj
 
-async def get_llm_settings(*, session: Session) -> List[LLM]| None:
+async def update_llm(*, session: Session, llm_update: admin_schema.LLMSelect) -> User:
+    llm = await session.get(LLM, llm_update.id)
+    
+    if not llm:
+        return None
+    else:
+        update_dict = llm_update.model_dump(exclude_unset=True)
+        llm.sqlmodel_update(update_dict)
+        llm.update_date = datetime.now()
+        session.add(llm)
+        await session.commit()
+        await session.refresh(llm)
+
+    return llm
+
+async def get_llm(*, session: Session) -> List[LLM]| None:
     statement = select(LLM)
     llm = await session.exec(statement)
 

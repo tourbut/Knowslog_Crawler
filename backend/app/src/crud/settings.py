@@ -3,7 +3,7 @@ from app.models import *
 from app.src.schemas import settings as settings_schema
 from sqlmodel import Session, select
 
-async def get_llm_settings(*, session: Session) -> List[LLM]| None:
+async def get_llm(*, session: Session) -> List[LLM]| None:
     statement = select(LLM)
     llm = await session.exec(statement)
 

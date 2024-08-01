@@ -11,10 +11,10 @@ from app.core.config import settings
 
 router = APIRouter()
 
-@router.get("/get_llm_settings", response_model=List[settings_schema.Setting_LLM])
-async def get_llm_settings(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
+@router.get("/get_llm", response_model=List[settings_schema.Setting_LLM])
+async def get_llm(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
     """
     Get LLM Settings
     """
-    settings = await settings_crud.get_llm_settings(session=session)
+    settings = await settings_crud.get_llm(session=session)
     return settings

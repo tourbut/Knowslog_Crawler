@@ -11,6 +11,7 @@ class LLMCreate(SQLModel):
     is_active: bool
 
 class LLMSelect(SQLModel):
+    id: int
     source: str
     type: str
     name: str
