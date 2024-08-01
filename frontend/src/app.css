@@ -5,7 +5,7 @@
 
 @layer components {
     .form-tabs {
-      @apply container mx-auto p-4 max-w-4xl;
+      @apply container mx-auto p-4 max-w-5xl;
     }
     .form-container {
       @apply container mx-auto p-4 max-w-md;

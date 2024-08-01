@@ -11,7 +11,7 @@ from app.core.config import settings
 
 router = APIRouter()
 
-@router.get("/get_llm", response_model=List[admin_schema.LLMSelect])
+@router.get("/get_llm", response_model=List[admin_schema.Get_LLM])
 async def get_llm(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
     """
     Get LLM Settings
@@ -34,8 +34,8 @@ async def create_llm(*, session: SessionDep_async, current_user: CurrentUser, ll
     
     llm = await admin_crud.create_llm(session=session, llm_create=llm_create)
 
-@router.put("/update_llm", response_model=admin_schema.LLMSelect)
-async def update_llm(*, session: SessionDep_async, current_user: CurrentUser, llm_update: admin_schema.LLMSelect) -> Any:
+@router.put("/update_llm", response_model=admin_schema.Get_LLM)
+async def update_llm(*, session: SessionDep_async, current_user: CurrentUser, llm_update: admin_schema.Get_LLM) -> Any:
     """
     Update LLM 
     """

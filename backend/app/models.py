@@ -38,11 +38,16 @@ class UserAPIKey(CommonBase, table=True):
     api_key:str = Field(nullable=False)
     active_yn:bool = Field(default=True)
 
-class UserUsage(CommonBase, table=True):
+class UserLLM(CommonBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="user.id")
-    api_id: int = Field(foreign_key="userapikey.id")
     llm_id: int = Field(foreign_key="llm.id")
+    api_id: int = Field(foreign_key="userapikey.id")
+    active_yn:bool = Field(default=True)
+
+class UserUsage(CommonBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    user_llm_id: int = Field(foreign_key="userllm.id")
     usage_date:datetime = Field(default=datetime.now())
     input_token:int = Field(nullable=False)
     output_token:int = Field(nullable=False)

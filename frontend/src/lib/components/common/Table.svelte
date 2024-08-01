@@ -12,6 +12,7 @@
     export let btn_click;
     export let form_data={}
     export let formModal = false;
+    export let btn_id=0;
     let is_new=false;
 
     function btn_edit(data)  {
@@ -34,10 +35,10 @@
     <Table hoverable={true}>
         <TableHead>
             {#each table_head as item}
-                <TableHeadCell>{item.desc}</TableHeadCell>
+                <TableHeadCell padding="px-3 py-3">{item.desc}</TableHeadCell>
             {/each}
             {#if is_editable}
-                <TableHeadCell></TableHeadCell>
+                <TableHeadCell padding="px-3 py-3"></TableHeadCell>
             {/if}
         </TableHead>
         <TableBody tableBodyClass="divide-y">
@@ -46,7 +47,7 @@
                     {#each table_head as head}
                     {#if (head.type === 'boolean')}
                     <TableBodyCell>
-                        <Checkbox bind:checked={item[head.name]} />
+                        <Checkbox disabled bind:checked={item[head.name]} />
                     </TableBodyCell>
                     {:else}
                     <TableBodyCell>{item[head.name]}</TableBodyCell>
@@ -66,7 +67,7 @@
     </div>
 </div>
 
-<Modal bind:open={formModal} size="xs" autoclose={false} outsideclose={true} class="w-full">
+<Modal bind:open={formModal} size="xs" autoclose={false} outsideclose={true} class="w-full" on:close={() => form_data={}}>
     <form class="flex flex-col space-y-3" action="#">
         {#if (is_new)}
         <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">항목 추가</h3>
@@ -84,6 +85,6 @@
                 </FloatingLabelInput>
             {/if}
         {/each}
-      <Button name={is_new ? "btn_new":"btn_update"} type="submit" class="w-full1" on:click={btn_click}>저장</Button>
+      <Button bind:id={btn_id} name={is_new ? "btn_new":"btn_update"} type="submit" class="w-full1" on:click={btn_click}>저장</Button>
     </form>
 </Modal>

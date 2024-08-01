@@ -11,7 +11,7 @@ async def create_llm(*, session: Session, llm_create: admin_schema.LLMCreate) ->
     await session.refresh(db_obj)
     return db_obj
 
-async def update_llm(*, session: Session, llm_update: admin_schema.LLMSelect) -> User:
+async def update_llm(*, session: Session, llm_update: admin_schema.Get_LLM) -> LLM:
     llm = await session.get(LLM, llm_update.id)
     
     if not llm:

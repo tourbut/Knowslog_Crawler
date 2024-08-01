@@ -10,7 +10,7 @@ class LLMCreate(SQLModel):
     output_price: float
     is_active: bool
 
-class LLMSelect(SQLModel):
+class Get_LLM(SQLModel):
     id: int
     source: str
     type: str
