@@ -27,7 +27,7 @@ export async function create_userllm(params, success_callback, failure_callback)
 
 export async function get_userllm(params, success_callback, failure_callback) {
     let url = "/settings/get_userllm/"
-    await fastapi('post', url, params,success_callback,failure_callback)
+    await fastapi('get', url, params,success_callback,failure_callback)
 }
 
 export async function update_userllm(params, success_callback, failure_callback) {
