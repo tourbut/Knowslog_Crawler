@@ -58,7 +58,7 @@ async def create_userllm(*, session: SessionDep_async, userllm_in: settings_sche
     userllm = await settings_crud.create_userllm(session=session, userllm_in=userllm_in,user_id=current_user.id)
     
 @router.put("/update_userllm")
-async def update_userllm(*, session: SessionDep_async, userllm_update: settings_schema.Get_UserLLM, current_user: CurrentUser) -> Any:
+async def update_userllm(*, session: SessionDep_async, userllm_update: settings_schema.Update_UserLLM, current_user: CurrentUser) -> Any:
     """
     Update User LLM
     """

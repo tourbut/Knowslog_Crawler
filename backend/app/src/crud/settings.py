@@ -44,7 +44,13 @@ async def update_apikey(*, session: Session, apikey_update: settings_schema.Get_
 
 
 async def get_userllm(*, session: Session,user_id:int) -> List[UserLLM]| None:
-    statement = select(UserLLM).where(UserLLM.user_id == user_id)
+    statement = select(UserLLM.id,
+                       LLM.source,
+                       LLM.name,
+                       UserAPIKey.api_key,
+                       UserLLM.active_yn).where(UserLLM.user_id == user_id,
+                                                   UserLLM.llm_id == LLM.id,
+                                                   UserLLM.api_id ==UserAPIKey.id)
     userllm = await session.exec(statement)
     if not userllm:
         return None
@@ -57,3 +63,18 @@ async def create_userllm(*, session: Session, userllm_in: settings_schema.Create
     await session.commit()
     await session.refresh(db_obj)
     return db_obj
+
+async def update_userllm(*, session: Session, userllm_update: settings_schema.Update_UserLLM) -> UserLLM:
+    userllm = await session.get(UserLLM, userllm_update.id)
+    
+    if not userllm:
+        return None
+    else:
+        update_dict = userllm_update.model_dump(exclude_unset=True)
+        userllm.sqlmodel_update(update_dict)
+        userllm.update_date = datetime.now()
+        session.add(userllm)
+        await session.commit()
+        await session.refresh(userllm)
+
+    return userllm

@@ -2,6 +2,7 @@ from app.models import *
 from sqlmodel import SQLModel
 
 class Get_LLM(SQLModel):
+    id:int
     source: str
     type: str
     name: str
@@ -22,13 +23,21 @@ class Get_Apikey(SQLModel):
     
 class Get_UserLLM(SQLModel):
     id:int
-    source:int
-    name:int
-    api_key:int
+    source:str
+    name:str
+    api_key:str
     active_yn:bool
 
 class Create_UserLLM(SQLModel):
     llm_id:int
     api_id:int
     active_yn:bool
-    
+
+class Update_UserLLM(SQLModel):
+    id:int
+    llm_id:int
+    api_id:int
+    active_yn:bool
+
+class Delete_UserLLM(SQLModel):
+    id:int
