@@ -22,7 +22,7 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
     
     try:
         if url.find("medium.com") != -1:
-            if ~(url.startswith("https://") or url.startswith("http://")):
+            if (url.startswith("https://") or url.startswith("http://"))== False:
                 url="https://"+url
             document,dom = get_medium(url=url,txt_html=None)
             category = "Medium"
