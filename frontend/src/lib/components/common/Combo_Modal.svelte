@@ -7,10 +7,6 @@
         {id:1,name:"col2",type:"boolean",desc:"샘플컬럼2"}
     ];
     
-    export let selected_menu=""
-    export let selected_item="선택하세요.";
-
-
     export let btn_click;
     export let form_data={}
     export let formModal = false;
