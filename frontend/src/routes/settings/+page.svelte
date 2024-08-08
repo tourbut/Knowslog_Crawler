@@ -38,7 +38,6 @@
       }
       let success_callback_userllm = (json) => {
         llm_table_body = json
-        console.log(llm_table_body)
       }
       let failure_callback = (json_error) => {
         addToast('error',json_error.detail)
