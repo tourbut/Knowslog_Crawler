@@ -3,8 +3,8 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 
 from app.src.deps import SessionDep_async,CurrentUser
-from app.src.crud import crawler as crawler_crud
-from app.src.schemas import crawler as crawler_schema
+from app.src.crud import archive as archive_crud
+from app.src.schemas import archive as archive_schema
 
 from app.core.config import settings
 from app.src.engine.crawler import get_medium,get_webpage
@@ -14,8 +14,8 @@ from requests.exceptions import RequestException
 router = APIRouter()
 
 
-@router.post("/run_crawler", response_model=crawler_schema.Archive)
-async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,archive_in: crawler_schema.ArchiveURL) -> Any:
+@router.post("/run_archiving", response_model=archive_schema.Archive)
+async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,archive_in: archive_schema.ArchiveURL) -> Any:
     
     url = archive_in.url
     category = ''
@@ -34,7 +34,7 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
     except Exception as e:
         raise HTTPException(status_code=404, detail=f"관리자에게 문의하세요. {e}")
     
-    arch = crawler_schema.Archive(category=category,
+    arch = archive_schema.Archive(category=category,
                                   language="eng",
                                   title=document['title'],
                                   author=document['author'],
@@ -42,6 +42,6 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
                                   url=url,
                                   dom=dom.prettify())
     
-    rst = await crawler_crud.create_archive(session=session, archive=arch,user_id=current_user.id)
+    rst = await archive_crud.create_archive(session=session, archive=arch,user_id=current_user.id)
     
     return rst

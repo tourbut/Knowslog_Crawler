@@ -20,7 +20,7 @@
     <NavUl >
         <NavLi href="/">Home</NavLi>
         {#if $username}
-        <NavLi href="/crawler">Crawler</NavLi>
+        <NavLi href="/archive">Archive</NavLi>
         <NavLi href="/chat">Chat</NavLi>
         <NavLi class="cursor-pointer">
             Settings<ChevronDownOutline class="w-6 h-6 ms-2 text-primary-800 dark:text-white inline" />
