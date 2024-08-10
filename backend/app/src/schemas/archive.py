@@ -14,3 +14,19 @@ class Archive(SQLModel):
     content: str 
     url : str 
     dom : str
+
+class ResponseArchive(SQLModel):
+    id: int
+    category: str
+    language: str
+    title: str 
+    author: str 
+    content: str 
+    url : str 
+    dom : str
+
+class ArchiveList(SQLModel):
+    id: int
+    category: str
+    title: str
+    url:str

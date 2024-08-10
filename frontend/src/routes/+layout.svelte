@@ -7,7 +7,7 @@
   import { onMount } from 'svelte';
   import Toasts from '$lib/components/common/Toasts.svelte';
   import { get_user } from '$lib/apis/user.js';
- 
+  import Sidebar from '$lib/components/common/Sidebar.svelte';
  
   async function checked_user_active()
   {
@@ -52,8 +52,23 @@
 </svelte:head>
 
 <Navigation />
-<slot></slot>
+
+<div class="container">
+  <div class="content">
+  <slot />
+  </div>
+</div> 
 
 <Toasts />
-
 <Footer />
+
+
+<style>
+.container {
+  display: flex;
+  min-height: 70vh; /* 브라우저 높이와 동일하게 설정 */
+}
+.content {
+  flex: 1; /* 남은 공간을 차지하도록 설정 */
+}
+</style>

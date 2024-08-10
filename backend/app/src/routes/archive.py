@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any,List
 
 from fastapi import APIRouter, HTTPException
 
@@ -14,7 +14,7 @@ from requests.exceptions import RequestException
 router = APIRouter()
 
 
-@router.post("/run_archiving", response_model=archive_schema.Archive)
+@router.post("/run_archiving", response_model=archive_schema.ResponseArchive)
 async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,archive_in: archive_schema.ArchiveURL) -> Any:
     
     url = archive_in.url
@@ -43,5 +43,20 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
                                   dom=dom.prettify())
     
     rst = await archive_crud.create_archive(session=session, archive=arch,user_id=current_user.id)
+    
+    return rst
+
+
+@router.get("/get_archive_list", response_model=List[archive_schema.ArchiveList])
+async def get_archive(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
+    
+    rst = await archive_crud.get_archive_list(session=session,user_id=current_user.id)
+    
+    return rst
+
+@router.get("/get_archive/{archive_id}", response_model=archive_schema.Archive)
+async def get_archive(*, session: SessionDep_async, current_user: CurrentUser,archive_id:int) -> Any:
+    
+    rst = await archive_crud.get_archive(session=session,user_id=current_user.id,archive_id=archive_id)
     
     return rst
