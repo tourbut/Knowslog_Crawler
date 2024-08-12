@@ -48,7 +48,7 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
 
 
 @router.get("/get_archive_list", response_model=List[archive_schema.ArchiveList])
-async def get_archive(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
+async def get_archive_list(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
     
     rst = await archive_crud.get_archive_list(session=session,user_id=current_user.id)
     

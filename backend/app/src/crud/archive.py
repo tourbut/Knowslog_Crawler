@@ -15,7 +15,7 @@ async def get_archive(*,session: Session,user_id:int,archive_id:int) -> Archive:
     if archive is None:
         return None
     else:
-        return archive.all()
+        return archive.first()
     
 async def get_archive_list(*,session: Session,user_id:int) -> Archive:
     query = select(Archive.id,

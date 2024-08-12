@@ -9,7 +9,7 @@
 
     import Sidebar from "$lib/components/common/Sidebar.svelte";
     import { onMount } from 'svelte';
-    import { get_archive_list } from "$lib/apis/archive";
+    import { get_archive_list, get_archive } from "$lib/apis/archive";
 
     let archive_list = []
     let dataLoaded = false
@@ -18,6 +18,7 @@
     let error = {detail:[]}
     let loading = false;
     let content = "Content will be displayed here"
+    let viewer_content = "Viewer Content will be displayed here"
     let auto_translate = true
     let auto_summarize = true
 
@@ -44,7 +45,6 @@
         addToast('info','수집 완료')
         loading = false;
         content = json.content
-        console.log(json)
 
         archive_list.forEach(item => {
           if (item.category == json.category) {
@@ -84,9 +84,10 @@
 
                 // 아이템 추가
                 categoryGroup.items.push({
-                    label: item.title || 'Untitled',  // title이 없을 경우 'Untitled'로 설정
-                    herf: `/archive/${item.id}`,            // id 기반 URL 설정
-                    caption: item.url
+                  id: item.id,
+                  label: item.title || 'Untitled',  // title이 없을 경우 'Untitled'로 설정
+                  herf: `/archive/${item.id}`,            // id 기반 URL 설정
+                  caption: item.url
                 });
             });
 
@@ -106,12 +107,33 @@
         get_data()
     })
 
+    async function onclick(event)
+    {
+      console.log(event.target.id)
+      const id = event.target.id;
+
+      let params = {
+        
+      }
+
+      let success_callback = (json) => {
+        viewer_content = json.content
+      }
+  
+      let failure_callback = (json_error) => {
+        error = json_error
+        loading = false;
+        addToast('error',error.detail)
+      }
+
+      await get_archive(id,params, success_callback, failure_callback);
+    }
   </script>
 
 <div class="container">
   <div class="bg-gray-50 dark:bg-gray-800" >
     {#if dataLoaded}
-        <Sidebar bind:side_menus={archive_list}/>
+        <Sidebar bind:side_menus={archive_list} btn_click={onclick} />
     {/if}
   </div>
   <div class="content">
@@ -146,9 +168,9 @@
     <div class="form-tabs">
       <Tabs>
         <TabItem open title="Viewer">
-          <MarkdownViewer bind:markdown={content} bind:loading={loading} />
+          <MarkdownViewer bind:markdown={viewer_content} bind:loading={loading} />
         </TabItem>
-        <TabItem open title="원본">
+        <TabItem title="원본">
           <MarkdownViewer bind:markdown={content} bind:loading={loading} />
         </TabItem>
         <TabItem title="번역">
