@@ -1,7 +1,7 @@
 <script>
     import { Button, Spinner } from "flowbite-svelte";
     import { Hr} from 'flowbite-svelte';
-    import { Card,Label, Input, InputAddon, ButtonGroup, Toggle} from 'flowbite-svelte';
+    import { Card,Label, Input, InputAddon, ButtonGroup, Toggle, Textarea} from 'flowbite-svelte';
     import { Tabs, TabItem } from 'flowbite-svelte';
     import { request_archiving } from "$lib/apis/archive";
     import MarkdownViewer from "$lib/components/archive/MarkdownViewer.svelte";
@@ -13,8 +13,9 @@
 
     let archive_list = []
     let dataLoaded = false
-
+    let is_html = false
     let _url = ''
+    let _html =''
     let error = {detail:[]}
     let loading = false;
     let content = "Content will be displayed here"
@@ -26,7 +27,7 @@
 
     const btn_start = async () => {
   
-      if (_url == '') {
+      if (_url == '' && _html == '') {
         addToast('warning','URL을 입력해주세요.')
         return
       }
@@ -39,6 +40,7 @@
   
       let params = {
         url: _url,
+        html: _html,
         auto_translate:auto_translate,
         auto_summarize:auto_summarize
       }
@@ -132,7 +134,9 @@
       await get_archive(id,params, success_callback, failure_callback);
       viewer_loading = false;
     }
-  </script>
+
+    $ : is_html ? _url = '' : _html = ''
+</script>
 
 <div class="container">
   <div class="bg-gray-50 dark:bg-gray-800" >
@@ -142,7 +146,18 @@
   </div>
   <div class="content">
     <Card class="form-container my-2">
+
       <div>
+        {#if is_html}
+        <Label for="html" class="mb-2">Html 입력</Label>
+        <Textarea id="html" bind:value={_html} />
+        <Button color="blue" on:click = {btn_start}>
+          {#if loading}
+          <Spinner class="me-3" size="4" color="white" />
+          {/if}
+          Start!
+        </Button>
+        {:else}
         <Label for="url" class="mb-2">수집 사이트 입력</Label>
         <ButtonGroup class="w-full">
           <InputAddon>https://</InputAddon>
@@ -154,9 +169,14 @@
             Start!
           </Button>
         </ButtonGroup>
+        {/if}
       </div>
+      <Hr hrClass="h-px my-1 bg-gray-200 border-0 dark:bg-gray-700"/>
       <div class="my-2">
-        <div class="grid gap-6 md:grid-cols-2">
+        <div class="grid gap-6 md:grid-cols-3">
+          <div>
+            <Toggle bind:checked={is_html}>Html 입력</Toggle>
+          </div>
           <div>
             <Toggle bind:checked={auto_translate}>자동 번역</Toggle>
           </div>

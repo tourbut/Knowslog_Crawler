@@ -1,3 +1,4 @@
+import html
 from typing import Any,List
 
 from fastapi import APIRouter, HTTPException
@@ -18,6 +19,7 @@ router = APIRouter()
 async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,archive_in: archive_schema.ArchiveURL) -> Any:
     
     url = archive_in.url
+    html = archive_in.html
     category = ''
     
     try:
@@ -26,6 +28,9 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
                 url="https://"+url
             document,dom = get_medium(url=url,txt_html=None)
             category = "Medium"
+        elif html:
+            document,dom = get_medium(url=url,txt_html=html)
+            category = "Webpage"
         else :
             document,dom = get_webpage(url=url)
             category = "Webpage"

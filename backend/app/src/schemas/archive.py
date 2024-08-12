@@ -3,6 +3,7 @@ from sqlmodel import SQLModel
 
 class ArchiveURL(SQLModel):
     url: str
+    html: str
     auto_translate: bool
     auto_summarize: bool
 
