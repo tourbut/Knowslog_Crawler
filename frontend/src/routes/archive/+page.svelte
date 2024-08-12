@@ -19,6 +19,8 @@
     let loading = false;
     let content = "Content will be displayed here"
     let viewer_content = "Viewer Content will be displayed here"
+    let viewer_loading = false
+    let viewer_orgin_data = ""
     let auto_translate = true
     let auto_summarize = true
 
@@ -109,7 +111,7 @@
 
     async function onclick(event)
     {
-      console.log(event.target.id)
+      viewer_loading = true;
       const id = event.target.id;
 
       let params = {
@@ -118,6 +120,7 @@
 
       let success_callback = (json) => {
         viewer_content = json.content
+        viewer_orgin_data= json.dom
       }
   
       let failure_callback = (json_error) => {
@@ -127,6 +130,7 @@
       }
 
       await get_archive(id,params, success_callback, failure_callback);
+      viewer_loading = false;
     }
   </script>
 
@@ -168,7 +172,7 @@
     <div class="form-tabs">
       <Tabs>
         <TabItem open title="Viewer">
-          <MarkdownViewer bind:markdown={viewer_content} bind:loading={loading} />
+          <MarkdownViewer bind:markdown={viewer_content} bind:loading={viewer_loading} bind:orgin_data={viewer_orgin_data} />
         </TabItem>
         <TabItem title="원본">
           <MarkdownViewer bind:markdown={content} bind:loading={loading} />
