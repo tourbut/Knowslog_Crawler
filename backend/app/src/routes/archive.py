@@ -1,4 +1,3 @@
-import html
 from typing import Any,List
 
 from fastapi import APIRouter, HTTPException
@@ -9,6 +8,7 @@ from app.src.schemas import archive as archive_schema
 
 from app.core.config import settings
 from app.src.engine.crawler import get_medium,get_webpage
+from app.src.engine.llms.chain import translate_chain,summarize_chain
 from datetime import datetime
 from requests.exceptions import RequestException
 
@@ -34,6 +34,7 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
         else :
             document,dom = get_webpage(url=url)
             category = "Webpage"
+            
     except RequestException as e:
         raise HTTPException(status_code=404, detail=f"URL 주소를 확인해주세요.")
     except Exception as e:
@@ -47,10 +48,20 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
                                   url=url,
                                   dom=dom.prettify())
     
+    if archive_in.auto_translate or archive_in.auto_summarize:
+        userllm = await archive_crud.get_userllm(session=session,user_id=current_user.id)
+    
+        
     rst = await archive_crud.create_archive(session=session, archive=arch,user_id=current_user.id)
     
     if archive_in.auto_translate:
         print("Auto Translate")
+        chain = translate_chain(api_key=userllm.api_key,
+                                model=userllm.name,)
+        response = chain.invoke({"document":arch.content})
+        print('content: ',response.content)
+        print('usage: ',response.usage_metadata)
+        print(response)
         
     if archive_in.auto_summarize:
         print("Auto Summarize")

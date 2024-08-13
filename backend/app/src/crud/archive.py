@@ -27,4 +27,17 @@ async def get_archive_list(*,session: Session,user_id:int) -> Archive:
         return None
     else:
         return archive.all()
-    
+
+async def get_userllm(*, session: Session,user_id:int) -> UserLLM| None:
+    statement = select(UserLLM.id,
+                       LLM.source,
+                       LLM.name,
+                       UserAPIKey.api_key).where(UserLLM.user_id == user_id,
+                                                   UserLLM.llm_id == LLM.id,
+                                                   UserLLM.api_id ==UserAPIKey.id,
+                                                   UserLLM.active_yn == True)
+    userllm = await session.exec(statement)
+    if not userllm:
+        return None
+    else:
+        return userllm.first()
