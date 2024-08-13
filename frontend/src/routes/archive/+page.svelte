@@ -10,6 +10,11 @@
     import Sidebar from "$lib/components/common/Sidebar.svelte";
     import { onMount } from 'svelte';
     import { get_archive_list, get_archive } from "$lib/apis/archive";
+    
+    let open_1 = true
+    let open_2 = false
+    let open_3 = false
+    let open_4 = false
 
     let archive_list = []
     let dataLoaded = false
@@ -26,7 +31,7 @@
     let auto_summarize = true
 
     const btn_start = async () => {
-  
+      open_2 = true
       if (_url == '' && _html == '') {
         addToast('warning','URL을 입력해주세요.')
         return
@@ -191,16 +196,16 @@
     
     <div class="form-tabs">
       <Tabs>
-        <TabItem open title="Viewer">
+        <TabItem bind:open={open_1} title="Viewer">
           <MarkdownViewer bind:markdown={viewer_content} bind:loading={viewer_loading} bind:orgin_data={viewer_orgin_data} />
         </TabItem>
-        <TabItem title="원본">
+        <TabItem bind:open={open_2} title="원본">
           <MarkdownViewer bind:markdown={content} bind:loading={loading} />
         </TabItem>
-        <TabItem title="번역">
+        <TabItem bind:open={open_3} title="번역">
           <MarkdownViewer bind:markdown={content} bind:loading={loading} />
         </TabItem>
-        <TabItem title="요약">
+        <TabItem bind:open={open_4} title="요약">
           <MarkdownViewer bind:markdown={content} bind:loading={loading} />
         </TabItem>
       </Tabs>

@@ -3,7 +3,7 @@
     import { Drawer, Button, CloseButton } from 'flowbite-svelte';
     import { ChevronDoubleUpOutline, ChevronDoubleDownOutline, AngleRightOutline, AngleLeftOutline } from 'flowbite-svelte-icons';
     import { sineIn } from 'svelte/easing';
-    let spanClass = 'flex-1 ms-3 whitespace-nowrap';
+    let spanClass = 'flex-1 ms-3 whitespace-nowrap w-9/10 overflow-hidden text-ellipsis';
     let is_hidden = true;
     export let side_menus = [
     { 
@@ -45,7 +45,7 @@
                             </svelte:fragment>
                             {#each menu.items as item}
                                 <SidebarDropdownItem id={item.id} label={item.label} href={item.herf} class={spanClass} on:click={btn_click} />
-                                <Tooltip target={item.id} placement="bottom">{item.caption}</Tooltip>
+                                <Tooltip target={item.id} placement="bottom">{item.label}<br>({item.caption})</Tooltip>
                             {/each}
                         </SidebarDropdownWrapper>
                         {/each}
