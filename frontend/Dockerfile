@@ -7,6 +7,7 @@ RUN apt-get install tzdata
 RUN apt-get update && \
     apt-get install -y gettext-base && \
     apt-get clean && \
+    apt-get install -y nodejs npm && \
     rm -rf /var/lib/apt/lists/*
 
 COPY ./frontend/nginx/nginx.conf.template /etc/nginx/nginx.conf.template
