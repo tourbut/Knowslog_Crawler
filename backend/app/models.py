@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, desc
 from pydantic import EmailStr
 
 from datetime import datetime
@@ -76,6 +76,27 @@ class UserPrompt(CommonBase,table=True):
     id: int | None = Field(default=None, primary_key=True)
     instruct_prompt: str | None = Field(nullable=True)
     response_prompt: str | None = Field(nullable=True)
+
+class SystemPrompt(CommonBase,table=True):
+    id: int | None = Field(default=None, primary_key=True, description="ID")
+    user_id: int = Field(foreign_key="user.id", description="유저ID")
+    work_cd: str = Field(nullable=False, description="작업코드")
+    description: str | None = Field(nullable=True, description="설명")
+    instruct_prompt: str | None = Field(nullable=True, description="지시 프롬프트")
+    response_prompt: str | None = Field(nullable=True, description="응답 프롬프트")
+
+class ClsfCode(CommonBase,table=True):
+    id: int | None = Field(default=None, primary_key=True, description="ID")
+    clsf_cd: str = Field(nullable=False, description="분류코드")
+    clsf_nm: str = Field(nullable=False, description="분류명")
+    clsf_desc: str | None = Field(nullable=True, description="분류설명")
+
+class CommonCode(CommonBase,table=True):
+    id: int | None = Field(default=None, primary_key=True, description="ID")
+    clsf_cd: str = Field(nullable=False, description="분류코드")
+    code: str = Field(nullable=False, description="코드")
+    code_nm: str = Field(nullable=False, description="코드명")
+    code_desc: str | None = Field(nullable=True, description="코드설명")
 
 """
 class CrewAgent(CommonBase,table=True):
