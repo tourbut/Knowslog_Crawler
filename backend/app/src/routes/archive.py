@@ -49,6 +49,12 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
     
     rst = await archive_crud.create_archive(session=session, archive=arch,user_id=current_user.id)
     
+    if archive_in.auto_translate:
+        print("Auto Translate")
+        
+    if archive_in.auto_summarize:
+        print("Auto Summarize")
+    
     return rst
 
 
