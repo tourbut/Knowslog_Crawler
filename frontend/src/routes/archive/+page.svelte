@@ -90,7 +90,7 @@
                 categoryGroup.items.push({
                   id: item.id,
                   label: item.title || 'Untitled',  // title이 없을 경우 'Untitled'로 설정
-                  herf: `/archive/${item.id}`,            // id 기반 URL 설정
+                  herf: '',            // id 기반 URL 설정
                   caption: item.url
                 });
             });
@@ -139,7 +139,7 @@
 </script>
 
 <div class="container">
-  <div class="bg-gray-50 dark:bg-gray-800" >
+  <div  >
     {#if dataLoaded}
         <Sidebar bind:side_menus={archive_list} btn_click={onclick} />
     {/if}
