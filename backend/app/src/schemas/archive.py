@@ -1,4 +1,3 @@
-from app.models import *
 from sqlmodel import SQLModel
 
 class ArchiveURL(SQLModel):
@@ -16,6 +15,17 @@ class Archive(SQLModel):
     url : str 
     dom : str
 
+class Refine(SQLModel):
+    user_id: int 
+    title: str 
+    author: str
+    content: str 
+
+class Usage(SQLModel):
+    user_llm_id: int 
+    input_token:int 
+    output_token:int
+    
 class ResponseArchive(SQLModel):
     id: int
     category: str
@@ -31,3 +41,9 @@ class ArchiveList(SQLModel):
     category: str
     title: str
     url:str
+    
+class GetUserLLM(SQLModel):
+    id: int
+    source: str
+    name: str
+    api_key: str

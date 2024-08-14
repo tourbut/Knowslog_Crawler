@@ -1,15 +1,9 @@
 from app.models import *
 from app.src.schemas import archive as archive_schema
-from sqlmodel import Session, select
+from sqlmodel import select
+from sqlmodel.ext.asyncio.session import AsyncSession
 
-async def create_archive(*,session: Session, archive: archive_schema.Archive,user_id:int) -> Archive:
-    db_obj = Archive.model_validate(archive,update={"user_id":user_id})
-    session.add(db_obj)
-    await session.commit()
-    await session.refresh(db_obj)
-    return db_obj
-
-async def get_archive(*,session: Session,user_id:int,archive_id:int) -> Archive:
+async def get_archive(*,session: AsyncSession,user_id:int,archive_id:int) -> Archive| None:
     query = select(Archive).where(Archive.user_id == user_id,Archive.id == archive_id)
     archive = await session.exec(query)
     if archive is None:
@@ -17,7 +11,7 @@ async def get_archive(*,session: Session,user_id:int,archive_id:int) -> Archive:
     else:
         return archive.first()
     
-async def get_archive_list(*,session: Session,user_id:int) -> Archive:
+async def get_archive_list(*,session: AsyncSession,user_id:int) -> Archive:
     query = select(Archive.id,
                    Archive.category,
                    Archive.title,
@@ -28,7 +22,7 @@ async def get_archive_list(*,session: Session,user_id:int) -> Archive:
     else:
         return archive.all()
 
-async def get_userllm(*, session: Session,user_id:int) -> UserLLM| None:
+async def get_userllm(*, session: AsyncSession,user_id:int) -> archive_schema.GetUserLLM| None:
     statement = select(UserLLM.id,
                        LLM.source,
                        LLM.name,
@@ -41,3 +35,55 @@ async def get_userllm(*, session: Session,user_id:int) -> UserLLM| None:
         return None
     else:
         return userllm.first()
+
+async def create_archive(*,session: AsyncSession, archive: archive_schema.Archive,user_id:int) -> Archive:
+    try:
+        db_obj = Archive.model_validate(archive, update={"user_id":user_id})
+        session.add(db_obj)
+        await session.commit()
+        await session.refresh(db_obj)
+        return db_obj
+    except Exception as e:
+        print(e)
+        await session.rollback()
+        raise e
+
+async def create_refine(*,session: AsyncSession, refine: archive_schema.Refine) -> Refine| None:
+    db_obj = Refine.model_validate(refine)
+    session.add(db_obj)
+    await session.commit()
+    await session.refresh(db_obj)
+    return db_obj
+
+async def create_usage(*,session: AsyncSession, usage: archive_schema.Usage) -> UserUsage| None:
+    db_obj = UserUsage.model_validate(usage)
+    session.add(db_obj)
+    await session.commit()
+    await session.refresh(db_obj)
+    return db_obj
+
+async def create_archive_refine_usage(*,session: AsyncSession,
+                                      archive: archive_schema.Archive, 
+                                      refine: archive_schema.Refine, 
+                                      usage: archive_schema.Usage,
+                                      user_id:int) -> Archive:
+    try:
+        if archive:
+            db_archive = Archive.model_validate(archive, update={"user_id":user_id})
+            session.add(db_archive)
+            await session.flush()
+        if refine:
+            db_refine = Refine.model_validate(refine, update={"user_id":user_id,
+                                                              "archive_id":db_archive.id})
+            session.add(db_refine)
+        if usage:
+            db_usage = UserUsage.model_validate(usage)
+            session.add(db_usage)
+        
+        await session.commit()
+        await session.refresh(db_archive)
+        return db_archive
+    except Exception as e:
+        print(e)
+        await session.rollback()
+        raise e
