@@ -23,10 +23,15 @@
     let _html =''
     let error = {detail:[]}
     let loading = false;
-    let content = "Content will be displayed here"
+
     let viewer_content = "Viewer Content will be displayed here"
     let viewer_loading = false
     let viewer_orgin_data = ""
+  
+    let orgin_content = "Content will be displayed here"
+    let tanslate_content = "Content will be displayed here"
+    let summary_content = "Content will be displayed here"
+
     let auto_translate = true
     let auto_summarize = true
 
@@ -53,13 +58,16 @@
       let success_callback = (json) => {
         addToast('info','수집 완료')
         loading = false;
-        content = json.content
-
+        
+        orgin_content = json.content
+        tanslate_content = json.refine_content
+        
         archive_list.forEach(item => {
           if (item.category == json.category) {
             item.items.push({
+              id: item.id,
               label: json.title || 'Untitled',  // title이 없을 경우 'Untitled'로 설정
-              herf: `/archive/${json.id}`,            // id 기반 URL 설정
+              herf: '',            // id 기반 URL 설정
               caption: json.url
             });
           }
@@ -200,13 +208,13 @@
           <MarkdownViewer bind:markdown={viewer_content} bind:loading={viewer_loading} bind:orgin_data={viewer_orgin_data} />
         </TabItem>
         <TabItem bind:open={open_2} title="원본">
-          <MarkdownViewer bind:markdown={content} bind:loading={loading} />
+          <MarkdownViewer bind:markdown={orgin_content} bind:loading={loading} />
         </TabItem>
         <TabItem bind:open={open_3} title="번역">
-          <MarkdownViewer bind:markdown={content} bind:loading={loading} />
+          <MarkdownViewer bind:markdown={tanslate_content} bind:loading={loading} />
         </TabItem>
         <TabItem bind:open={open_4} title="요약">
-          <MarkdownViewer bind:markdown={content} bind:loading={loading} />
+          <MarkdownViewer bind:markdown={summary_content} bind:loading={loading} />
         </TabItem>
       </Tabs>
     </div>  

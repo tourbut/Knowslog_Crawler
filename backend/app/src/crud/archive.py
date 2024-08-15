@@ -68,6 +68,10 @@ async def create_archive_refine_usage(*,session: AsyncSession,
                                       usage: archive_schema.Usage,
                                       user_id:int) -> Archive:
     try:
+        db_archive = None
+        db_refine = None
+        db_usage = None
+        
         if archive:
             db_archive = Archive.model_validate(archive, update={"user_id":user_id})
             session.add(db_archive)
@@ -81,8 +85,12 @@ async def create_archive_refine_usage(*,session: AsyncSession,
             session.add(db_usage)
         
         await session.commit()
-        await session.refresh(db_archive)
-        return db_archive
+        
+        await session.refresh(db_archive) if archive else None
+        await session.refresh(db_refine) if refine else None
+        await session.refresh(db_usage) if usage else None
+        
+        return db_archive, db_refine, db_usage
     except Exception as e:
         print(e)
         await session.rollback()

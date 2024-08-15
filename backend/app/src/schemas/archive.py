@@ -32,7 +32,10 @@ class ResponseArchive(SQLModel):
     language: str
     title: str 
     author: str 
-    content: str 
+    content: str
+    refine_content: str| None
+    input_token: int| None
+    output_token: int | None
     url : str 
     dom : str
 

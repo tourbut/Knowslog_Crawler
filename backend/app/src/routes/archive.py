@@ -22,11 +22,7 @@ async def translate_archive(in_archive:archive_schema.Archive,
                             model=in_userllm.name)
     
     response = chain.invoke({"document":in_archive.content})
-    
-    print('content: ',response.content)
-    print('usage: ',response.usage_metadata)
-    
-    
+
     refine = archive_schema.Refine(user_id=user_id,
                                    title=in_archive.title,
                                    author=in_archive.author,
@@ -45,7 +41,9 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
     url = archive_in.url
     html = archive_in.html
     category = ''
-
+    rst_arch = None
+    rst_refine = None
+    rst_usage = None
     try:
         if archive_in.auto_translate or archive_in.auto_summarize:
             userllm = await archive_crud.get_userllm(session=session,user_id=current_user.id)
@@ -77,11 +75,24 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
         if archive_in.auto_summarize:
             print("Auto Summarize")
         
-        rst = await archive_crud.create_archive_refine_usage(session=session,
+        rst_arch,rst_refine,rst_usage = await archive_crud.create_archive_refine_usage(session=session,
                                                              archive=arch,
                                                              refine=rst_refine,
                                                              usage=rst_usage,
                                                              user_id=current_user.id)
+        
+        response = archive_schema.ResponseArchive(id=rst_arch.id,
+                                                  category=rst_arch.category,
+                                                  language=rst_arch.language,
+                                                  title=rst_arch.title,
+                                                  author=rst_arch.author,
+                                                  content=rst_arch.content,
+                                                  refine_content=rst_refine.content if rst_refine else None,
+                                                  input_token=rst_usage.input_token if rst_usage else None,
+                                                  output_token=rst_usage.output_token if rst_usage else None,
+                                                  url=rst_arch.url,
+                                                  dom=rst_arch.dom)
+        
             
     except RequestException as e:
         raise HTTPException(status_code=404, detail=f"URL 주소를 확인해주세요.")
@@ -89,7 +100,7 @@ async def run_crawler(*, session: SessionDep_async, current_user: CurrentUser,ar
         print(e)
         raise HTTPException(status_code=404, detail=f"관리자에게 문의하세요. {e}")
     
-    return rst
+    return response
 
 
 @router.get("/get_archive_list", response_model=List[archive_schema.ArchiveList])
