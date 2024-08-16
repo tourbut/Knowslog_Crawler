@@ -1,9 +1,9 @@
 <script>
     import { Sidebar, SidebarGroup, SidebarItem, SidebarWrapper,SidebarDropdownWrapper,SidebarDropdownItem,Tooltip } from 'flowbite-svelte';
-    import { Drawer, Button, CloseButton } from 'flowbite-svelte';
-    import { ChevronDoubleUpOutline, ChevronDoubleDownOutline, AngleRightOutline, AngleLeftOutline } from 'flowbite-svelte-icons';
+    import { P, Drawer, Button, CloseButton, Popover } from 'flowbite-svelte';
+    import { ChevronDoubleUpOutline, ChevronDoubleDownOutline, AngleRightOutline, AngleLeftOutline, CloseCircleSolid } from 'flowbite-svelte-icons';
     import { sineIn } from 'svelte/easing';
-    let spanClass = 'flex-1 ms-3 whitespace-nowrap w-9/10 overflow-hidden text-ellipsis';
+    let spanClass = 'flex-1 ms-3 whitespace-nowrap';
     let is_hidden = true;
     export let side_menus = [
     { 
@@ -15,6 +15,7 @@
     }];
     
     export let btn_click;
+    export let btn_item_more_click;
     let backdrop = false;
     let transitionParams = {
     x: -320,
@@ -36,18 +37,20 @@
                 <SidebarWrapper>
                     <SidebarGroup>
                         {#each side_menus as menu (menu.category)}
-                        <SidebarDropdownWrapper label={menu.category}>
-                            <svelte:fragment slot="arrowup">
-                                <ChevronDoubleUpOutline class="w-6 h-6" />
-                            </svelte:fragment>
-                            <svelte:fragment slot="arrowdown">
-                                <ChevronDoubleDownOutline class="w-6 h-6" />
-                            </svelte:fragment>
+                        
                             {#each menu.items as item}
-                                <SidebarDropdownItem id={item.id} label={item.label} href={item.herf} class={spanClass} on:click={btn_click} />
-                                <Tooltip target={item.id} placement="bottom">{item.label}<br>({item.caption})</Tooltip>
+                            <div style="display: flex; align-items: center;">
+                                <SidebarItem class={spanClass} id={item.id} label={item.label.substring(0,18)+"..."} href={item.herf}  on:click={btn_click} >
+                                </SidebarItem>
+                                <button on:click={btn_item_more_click}>
+                                    <CloseCircleSolid color="#ca0001" id={item.id}/>
+                                </button>
+                            </div>
+                            <Tooltip target={item.id} placement="bottom">
+                                <P color="text-white-700" size="sm" weight="black">{item.label}</P>
+                                <P color="text-white-700" size="xs">({item.caption})</P>
+                            </Tooltip>
                             {/each}
-                        </SidebarDropdownWrapper>
                         {/each}
                     </SidebarGroup>
                 </SidebarWrapper>

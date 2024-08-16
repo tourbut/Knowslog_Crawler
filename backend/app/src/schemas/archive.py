@@ -17,8 +17,7 @@ class Archive(SQLModel):
 
 class Refine(SQLModel):
     user_id: int 
-    title: str 
-    author: str
+    work_cd: str
     content: str 
 
 class Usage(SQLModel):
@@ -33,9 +32,12 @@ class ResponseArchive(SQLModel):
     title: str 
     author: str 
     content: str
-    refine_content: str| None
-    input_token: int| None
-    output_token: int | None
+    translate_content: str| None
+    translate_input_token: int| None
+    translate_output_token: int | None
+    summarize_content: str| None
+    summarize_input_token: int| None
+    summarize_output_token: int | None
     url : str 
     dom : str
 
@@ -50,3 +52,14 @@ class GetUserLLM(SQLModel):
     source: str
     name: str
     api_key: str
+    
+class Update_Archive(SQLModel):
+    id: int
+    category: str|None = None
+    language: str|None = None
+    title: str|None = None
+    author: str|None = None
+    content: str|None = None
+    url : str|None = None
+    dom : str|None = None
+    delete_yn: bool|None = None

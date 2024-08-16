@@ -9,7 +9,7 @@
 
     import Sidebar from "$lib/components/common/Sidebar.svelte";
     import { onMount } from 'svelte';
-    import { get_archive_list, get_archive } from "$lib/apis/archive";
+    import { get_archive_list, get_archive, delete_archive } from "$lib/apis/archive";
     
     let open_1 = true
     let open_2 = false
@@ -18,7 +18,6 @@
 
     let archive_list = []
     let dataLoaded = false
-    let is_html = false
     let _url = ''
     let _html =''
     let error = {detail:[]}
@@ -29,8 +28,8 @@
     let viewer_orgin_data = ""
   
     let orgin_content = "Content will be displayed here"
-    let tanslate_content = "Content will be displayed here"
-    let summary_content = "Content will be displayed here"
+    let translate_content = "Content will be displayed here"
+    let summarize_content = "Content will be displayed here"
 
     let auto_translate = true
     let auto_summarize = true
@@ -60,8 +59,11 @@
         loading = false;
         
         orgin_content = json.content
-        tanslate_content = json.refine_content
+        translate_content = json.translate_content
+        summarize_content = json.summarize_content
         
+        console.log(json)
+
         archive_list.forEach(item => {
           if (item.category == json.category) {
             item.items.push({
@@ -128,7 +130,6 @@
     {
       viewer_loading = true;
       const id = event.target.id;
-
       let params = {
         
       }
@@ -148,13 +149,47 @@
       viewer_loading = false;
     }
 
+    async function btn_item_more_click(event)
+    {
+      console.log(event.target.id)
+      
+      if (event.target.id =='') {
+        return
+      }
+
+      let params = {
+        id: event.target.id
+      }
+
+      let success_callback = (json) => {
+        addToast('info','삭제 완료')
+        archive_list.forEach(item => {
+          item.items = item.items.filter(item => item.id != event.target.id)
+        });
+      }
+
+      let failure_callback = (json_error) => {
+        error = json_error
+        loading = false;
+        addToast('error',error.detail)
+      }
+
+      await delete_archive(params, success_callback, failure_callback);
+    }
+
+    let is_html = false
+    let translate_tabon = true
+    let summarize_tabon = true
+
     $ : is_html ? _url = '' : _html = ''
+    $ : translate_content != "Content will be displayed here" ? translate_tabon = false : translate_tabon = true 
+    $ : summarize_content != "Content will be displayed here" ? summarize_tabon = false : summarize_tabon = true 
 </script>
 
 <div class="container">
-  <div  >
+  <div>
     {#if dataLoaded}
-        <Sidebar bind:side_menus={archive_list} btn_click={onclick} />
+        <Sidebar bind:side_menus={archive_list} btn_click={onclick} btn_item_more_click={btn_item_more_click}/>
     {/if}
   </div>
   <div class="content">
@@ -210,11 +245,11 @@
         <TabItem bind:open={open_2} title="원본">
           <MarkdownViewer bind:markdown={orgin_content} bind:loading={loading} />
         </TabItem>
-        <TabItem bind:open={open_3} title="번역">
-          <MarkdownViewer bind:markdown={tanslate_content} bind:loading={loading} />
+        <TabItem bind:open={open_3} title="번역" disabled={translate_tabon}>
+          <MarkdownViewer bind:markdown={translate_content} bind:loading={loading} />
         </TabItem>
-        <TabItem bind:open={open_4} title="요약">
-          <MarkdownViewer bind:markdown={summary_content} bind:loading={loading} />
+        <TabItem bind:open={open_4} title="요약" disabled={summarize_tabon} >
+          <MarkdownViewer bind:markdown={summarize_content} bind:loading={loading} />
         </TabItem>
       </Tabs>
     </div>  
