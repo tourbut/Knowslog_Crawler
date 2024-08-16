@@ -64,12 +64,11 @@ class Archive(CommonBase, table=True):
     dom: str | None = Field(nullable=True)
 
 class Refine(CommonBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    archive_id: int = Field(foreign_key="archive.id")
-    user_id: int = Field(foreign_key="user.id")
-    title: str | None = Field(nullable=True)
-    author: str | None = Field(nullable=True)
-    content: str = Field(nullable=False)
+    id: int | None = Field(default=None, primary_key=True, description="ID")
+    archive_id: int = Field(foreign_key="archive.id", nullable=False, description="아카이브ID")
+    user_id: int = Field(foreign_key="user.id", nullable=False, description="유저ID")
+    work_cd: str = Field(nullable=False, description="작업코드")
+    content: str = Field(nullable=False, description="내용")
     
 class UserPrompt(CommonBase,table=True):
     user_id: int = Field(foreign_key="user.id", primary_key=True)
