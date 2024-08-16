@@ -1,3 +1,4 @@
+from typing import List
 from app.models import *
 from app.src.schemas import archive as archive_schema
 from sqlmodel import select
@@ -12,7 +13,16 @@ async def get_archive(*,session: AsyncSession,user_id:int,archive_id:int) -> Arc
         return None
     else:
         return archive.first()
-    
+
+async def get_refine(*,session: AsyncSession,user_id:int,archive_id:int) -> List[Refine]| None:
+    query = select(Refine).where(Refine.user_id == user_id,
+                                 Refine.archive_id == archive_id)
+    refine = await session.exec(query)
+    if refine is None:
+        return None
+    else:
+        return refine.all()
+
 async def get_archive_list(*,session: AsyncSession,user_id:int) -> Archive:
     query = select(Archive.id,
                    Archive.category,

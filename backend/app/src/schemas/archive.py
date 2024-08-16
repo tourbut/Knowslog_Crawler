@@ -32,12 +32,12 @@ class ResponseArchive(SQLModel):
     title: str 
     author: str 
     content: str
-    translate_content: str| None
-    translate_input_token: int| None
-    translate_output_token: int | None
-    summarize_content: str| None
-    summarize_input_token: int| None
-    summarize_output_token: int | None
+    translate_content: str| None = None
+    translate_input_token: int| None = None
+    translate_output_token: int | None = None
+    summarize_content: str| None = None
+    summarize_input_token: int| None = None
+    summarize_output_token: int | None = None
     url : str 
     dom : str
 

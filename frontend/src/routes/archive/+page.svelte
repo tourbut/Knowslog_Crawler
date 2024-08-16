@@ -11,8 +11,7 @@
     import { onMount } from 'svelte';
     import { get_archive_list, get_archive, delete_archive } from "$lib/apis/archive";
     
-    let open_1 = true
-    let open_2 = false
+    let open_2 = true
     let open_3 = false
     let open_4 = false
 
@@ -23,11 +22,10 @@
     let error = {detail:[]}
     let loading = false;
 
-    let viewer_content = "Viewer Content will be displayed here"
-    let viewer_loading = false
-    let viewer_orgin_data = ""
   
     let orgin_content = "Content will be displayed here"
+    let orgin_data = ""
+
     let translate_content = "Content will be displayed here"
     let summarize_content = "Content will be displayed here"
 
@@ -128,15 +126,23 @@
 
     async function onclick(event)
     {
-      viewer_loading = true;
+      console.log(event.target)
+      
+      if (event.target.id =='') {
+        return
+      }
+
       const id = event.target.id;
+
       let params = {
         
       }
 
       let success_callback = (json) => {
-        viewer_content = json.content
-        viewer_orgin_data= json.dom
+        orgin_content = json.content
+        orgin_data= json.dom
+        translate_content = json.translate_content
+        summarize_content = json.summarize_content
       }
   
       let failure_callback = (json_error) => {
@@ -146,7 +152,6 @@
       }
 
       await get_archive(id,params, success_callback, failure_callback);
-      viewer_loading = false;
     }
 
     async function btn_item_more_click(event)
@@ -239,16 +244,13 @@
     
     <div class="form-tabs">
       <Tabs>
-        <TabItem bind:open={open_1} title="Viewer">
-          <MarkdownViewer bind:markdown={viewer_content} bind:loading={viewer_loading} bind:orgin_data={viewer_orgin_data} />
+        <TabItem open={true} title="원본">
+          <MarkdownViewer bind:markdown={orgin_content} bind:loading={loading} bind:orgin_data={orgin_data}/>
         </TabItem>
-        <TabItem bind:open={open_2} title="원본">
-          <MarkdownViewer bind:markdown={orgin_content} bind:loading={loading} />
-        </TabItem>
-        <TabItem bind:open={open_3} title="번역" disabled={translate_tabon}>
+        <TabItem title="번역" disabled={translate_tabon}>
           <MarkdownViewer bind:markdown={translate_content} bind:loading={loading} />
         </TabItem>
-        <TabItem bind:open={open_4} title="요약" disabled={summarize_tabon} >
+        <TabItem title="요약" disabled={summarize_tabon} >
           <MarkdownViewer bind:markdown={summarize_content} bind:loading={loading} />
         </TabItem>
       </Tabs>

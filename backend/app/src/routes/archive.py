@@ -140,12 +140,28 @@ async def get_archive_list(*, session: SessionDep_async, current_user: CurrentUs
     
     return rst
 
-@router.get("/get_archive/{archive_id}", response_model=archive_schema.Archive)
+@router.get("/get_archive/{archive_id}", response_model=archive_schema.ResponseArchive)
 async def get_archive(*, session: SessionDep_async, current_user: CurrentUser,archive_id:int) -> Any:
     
-    rst = await archive_crud.get_archive(session=session,user_id=current_user.id,archive_id=archive_id)
+    rst_archive = await archive_crud.get_archive(session=session,user_id=current_user.id,archive_id=archive_id)
+    rst_refines = await archive_crud.get_refine(session=session,user_id=current_user.id,archive_id=archive_id)
     
-    return rst
+    response = archive_schema.ResponseArchive(id=rst_archive.id,
+                                                category=rst_archive.category,
+                                                language=rst_archive.language,
+                                                title=rst_archive.title,
+                                                author=rst_archive.author,
+                                                content=rst_archive.content,
+                                                url=rst_archive.url,
+                                                dom=rst_archive.dom)
+    
+    for refine in rst_refines:
+        if refine.work_cd == "01":
+            response.translate_content = refine.content
+        elif refine.work_cd == "02":
+            response.summarize_content = refine.content
+    
+    return response
 
 @router.put("/delete_archive/")
 async def delete_archive(*, session: SessionDep_async, current_user: CurrentUser,in_archive:archive_schema.Update_Archive) -> Any:
