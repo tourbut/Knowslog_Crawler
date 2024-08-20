@@ -7,6 +7,7 @@ class OutMessage(SQLModel):
     content: str
     input_token: int | None = None
     output_token: int | None = None
+    is_done: bool = False
     
 class GetUserLLM(SQLModel):
     id: int

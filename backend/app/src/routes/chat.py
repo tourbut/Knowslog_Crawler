@@ -31,17 +31,17 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
             chunks.append(chunk)
             yield chat_schema.OutMessage(content=chunk.content,
                                          input_token=chunk.usage_metadata['input_tokens'] if chunk.usage_metadata is not None else None,
-                                         output_token=chunk.usage_metadata['output_tokens'] if chunk.usage_metadata is not None else None,).model_dump_json()
+                                         output_token=chunk.usage_metadata['output_tokens'] if chunk.usage_metadata is not None else None,
+                                         is_done=False).model_dump_json()
             
         response=chunks[0]
         
         for chunk in chunks[1:]:
             response+=chunk
-        
+        print(response.content)
         yield chat_schema.OutMessage(content=response.content,
                                     input_token=response.usage_metadata['input_tokens'],
-                                    output_token=response.usage_metadata['output_tokens'],).model_dump_json()
+                                    output_token=response.usage_metadata['output_tokens'],
+                                    is_done=True).model_dump_json()
         
     return StreamingResponse(chain_astream(chat_in.input),media_type='text/event-stream')
-            
-            
