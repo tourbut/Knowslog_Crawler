@@ -1,6 +1,6 @@
 from sqlmodel import Field, SQLModel, desc
 from pydantic import EmailStr
-
+import uuid
 from datetime import datetime
 
 class CommonBase(SQLModel):
@@ -96,6 +96,20 @@ class CommonCode(CommonBase,table=True):
     code: str = Field(nullable=False, description="코드")
     code_nm: str = Field(nullable=False, description="코드명")
     code_desc: str | None = Field(nullable=True, description="코드설명")
+
+class Chats(CommonBase,table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    user_id: int = Field(foreign_key="user.id", description="유저ID")
+    title: str = Field(nullable=False, description="채팅명")
+    user_llm_id: int = Field(foreign_key="userllm.id", description="유저LLMID")
+
+class Messages(CommonBase,table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    chat_id: uuid.UUID = Field(foreign_key="chats.id", description="채팅ID")
+    user_id: int = Field(foreign_key="user.id", description="유저ID")
+    name:str = Field(nullable=False, description="이름")
+    content: str = Field(nullable=False, description="내용")
+    is_user: bool = Field(nullable=False, description="유저여부")
 
 """
 class CrewAgent(CommonBase,table=True):
