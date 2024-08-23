@@ -124,15 +124,11 @@
         get_data()
     })
 
-    async function onclick(event)
-    {
-      console.log(event.target)
+    const onclick = async (id) => {
       
-      if (event.target.id =='') {
+      if (id =='') {
         return
       }
-
-      const id = event.target.id;
 
       let params = {
         

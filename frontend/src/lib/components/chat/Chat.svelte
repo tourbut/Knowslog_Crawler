@@ -1,26 +1,38 @@
 <script>
+    import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Dropdown, DropdownItem, DropdownDivider } from 'flowbite-svelte';
+    import { ChevronDownOutline } from 'flowbite-svelte-icons';
+    import { onMount } from 'svelte';
+
     import MessageInput from "./MessageInput.svelte";
     import Message from "./Message.svelte";
-    import { send_message } from "$lib/apis/chat";
-    import { v4 as uuidv4 } from "uuid";
+    import { send_message, get_messages } from "$lib/apis/chat";
     import { addToast } from '$lib/common';
-    
+
+    export let userllm_list = []
+    export let chat_id = ''
     let message_list= []
-
     let user_msg = '';
-
+    let selected_userllm={value:0,name:"모델선택"}
+    
     const sendMessage = async () => {
+        if (user_msg == '') {
+            return;
+        }
+
+        if (selected_userllm.value == 0) {
+            addToast('error','모델을 선택해주세요.')
+            return;
+        }
+
         let message = {
-            id : uuidv4(),
-            name: 'Shin',
+            name: '',
             msg: user_msg,
             time: new Date().toLocaleString(),
             is_user: true
         }
 
         let res_msg= {
-            id : uuidv4(),
-            name: 'bot',
+            name: 'Knowslog Bot',
             msg: '',
             time: new Date().toLocaleString(),
             is_user: false
@@ -30,7 +42,9 @@
         message_list = [...message_list, res_msg];
 
         let params = {
-            input: user_msg
+            chat_id: chat_id,
+            user_llm_id: selected_userllm.value,
+            input: user_msg,
         }
 
         let success_callback = (json) => {
@@ -38,7 +52,7 @@
         }
 
         let failure_callback = (json_error) => {
-            console.log(json_error)
+            addToast('error',json_error.detail)
         }
 
         let streamCallback = (json) => {
@@ -50,11 +64,56 @@
                 message_list[message_list.length-1].msg += json.content
             }
         }
-
+        console.log(params)
         await send_message(params, success_callback, failure_callback,streamCallback);
     }
-</script>
 
+    async function get_data()
+    {
+        console.log(chat_id)
+        
+        let params = {
+            chat_id: chat_id
+        }
+
+        let success_callback = (json) => {
+            console.log(json)
+            message_list = json.map(item => {return {
+                name:item.name,
+                msg:item.content,
+                time:item.create_date,
+                is_user:item.is_user}})
+        }
+
+        let failure_callback = (json_error) => {
+            addToast('error',json_error.detail)
+        }
+        await get_messages(params, success_callback, failure_callback);
+
+    }
+
+    $: {
+        if (chat_id) {
+            get_data();
+        }
+    }
+
+</script>
+<div >
+    <Navbar rounded color="form">
+        <NavHamburger />
+        <NavUl >
+          <NavLi class="cursor-pointer">
+            {selected_userllm.name}<ChevronDownOutline class="w-6 h-6 ms-2 text-primary-800 dark:text-white inline" />
+          </NavLi>
+          <Dropdown class="w-44 z-20">
+            {#each userllm_list as userllm}
+                <DropdownItem on:click={()=>{selected_userllm=userllm}}>{userllm.name}</DropdownItem>
+            {/each}
+          </Dropdown>
+        </NavUl>
+      </Navbar>
+</div>
 <div class="flex flex-col gap-4">
     <div class="message-container">
         {#each message_list as message}

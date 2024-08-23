@@ -11,17 +11,16 @@
     export let form_data={}
     export let formModal = false;
     export let btn_id=0;
-    
+    export let header="";
     export let is_new=false;
 
 </script>
 
 <Modal bind:open={formModal} size="xs" autoclose={false} outsideclose={true} class="w-full" on:close={() => form_data={}}>
     <form class="flex flex-col space-y-3" action="#">
-        {#if (is_new)}
-        <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">항목 추가</h3>
-        {:else}
-        <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">항목 수정</h3>
+        {#if (header)}
+        <h3 class="mb-4 text-xl font-medium text-gray-900 dark:text-white">{header}</h3>
+        
         {/if}
         {#each table_head as head}
             {#if (head.type === 'boolean')}

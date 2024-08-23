@@ -7,7 +7,6 @@
   import { onMount } from 'svelte';
   import Toasts from '$lib/components/common/Toasts.svelte';
   import { get_user } from '$lib/apis/user.js';
-  import Sidebar from '$lib/components/common/Sidebar.svelte';
  
   async function checked_user_active()
   {
