@@ -10,13 +10,12 @@
  
   async function checked_user_active()
   {
-    
     let params = {}
     
     let success_callback = (json) => {
       let is_active=json.is_active
       if (!is_active) {
-          alert("세션이 만료되었습니다. 다시 로그인해주세요.");
+          alert("활성화된 계정이 아닙니다.");
           goto('/login');
         }
     }

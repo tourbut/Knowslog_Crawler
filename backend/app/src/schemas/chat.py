@@ -3,12 +3,12 @@ from sqlmodel import SQLModel
 from datetime import datetime
 
 class SendMessage(SQLModel):
-    chat_id: str
-    user_llm_id: int 
+    chat_id: uuid.UUID 
+    user_llm_id: uuid.UUID  
     input: str
     
 class Usage(SQLModel):
-    user_llm_id: int 
+    user_llm_id: uuid.UUID  
     input_token:int 
     output_token:int
 
@@ -19,23 +19,23 @@ class OutMessage(SQLModel):
     is_done: bool = False
     
 class GetUserLLM(SQLModel):
-    id: int
+    id: uuid.UUID 
     source: str
     name: str
     api_key: str
     
 class CreateChat(SQLModel):
     title: str
-    user_llm_id: int
+    user_llm_id: uuid.UUID
 
 class ResponseChat(SQLModel):
-    id: str
+    id: uuid.UUID 
     
 class GetChat(SQLModel):
     category: str = "chat"
     id: uuid.UUID
     title: str
-    user_llm_id: int
+    user_llm_id: uuid.UUID
 
 class GetMessages(SQLModel):
     chat_id: str
@@ -50,8 +50,21 @@ class ReponseMessages(SQLModel):
 
 class CreateMessage(SQLModel):
     chat_id: uuid.UUID 
-    user_id: int
+    user_id: uuid.UUID 
     name: str 
     content: str
     is_user: bool
     
+class Chat(SQLModel):
+    category: str
+    language: str
+    title: str 
+    author: str 
+    content: str 
+    url : str 
+    dom : str
+    
+class Update_Chat(SQLModel):
+    id: uuid.UUID
+    title: str|None = None
+    delete_yn: bool|None = None

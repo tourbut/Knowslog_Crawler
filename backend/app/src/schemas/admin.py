@@ -1,5 +1,5 @@
-from app.models import *
 from sqlmodel import SQLModel
+import uuid
 
 class LLMCreate(SQLModel):
     source: str
@@ -8,14 +8,14 @@ class LLMCreate(SQLModel):
     description: str
     input_price: float
     output_price: float
-    is_active: bool
+    is_active: bool = False
 
 class Get_LLM(SQLModel):
-    id: int
+    id: uuid.UUID 
     source: str
     type: str
     name: str
     description: str
     input_price: float
     output_price: float
-    is_active: bool
+    is_active: bool = False

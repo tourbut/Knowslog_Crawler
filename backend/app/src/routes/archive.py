@@ -1,3 +1,4 @@
+import uuid
 from typing import Any,List
 
 from fastapi import APIRouter, HTTPException
@@ -16,7 +17,7 @@ router = APIRouter()
 
 async def translate_archive(in_archive:archive_schema.Archive,
                             in_userllm:archive_schema.GetUserLLM,
-                            user_id:int):
+                            user_id:uuid.UUID):
     
     chain = translate_chain(api_key=in_userllm.api_key,
                             model=in_userllm.name)
@@ -36,7 +37,7 @@ async def translate_archive(in_archive:archive_schema.Archive,
 
 async def summarize_archive(in_archive:archive_schema.Archive,
                             in_userllm:archive_schema.GetUserLLM,
-                            user_id:int):
+                            user_id:uuid.UUID):
     
     chain = summarize_chain(api_key=in_userllm.api_key,
                             model=in_userllm.name)
@@ -141,7 +142,7 @@ async def get_archive_list(*, session: SessionDep_async, current_user: CurrentUs
     return rst
 
 @router.get("/get_archive/{archive_id}", response_model=archive_schema.ResponseArchive)
-async def get_archive(*, session: SessionDep_async, current_user: CurrentUser,archive_id:int) -> Any:
+async def get_archive(*, session: SessionDep_async, current_user: CurrentUser,archive_id:uuid.UUID) -> Any:
     
     rst_archive = await archive_crud.get_archive(session=session,user_id=current_user.id,archive_id=archive_id)
     rst_refines = await archive_crud.get_refine(session=session,user_id=current_user.id,archive_id=archive_id)

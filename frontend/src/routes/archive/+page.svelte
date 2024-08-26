@@ -150,22 +150,20 @@
       await get_archive(id,params, success_callback, failure_callback);
     }
 
-    async function btn_item_more_click(event)
+    const btn_item_more_click = async (id) =>
     {
-      console.log(event.target.id)
-      
-      if (event.target.id =='') {
+      if (id =='') {
         return
       }
 
       let params = {
-        id: event.target.id
+        id: id
       }
 
       let success_callback = (json) => {
         addToast('info','삭제 완료')
         archive_list.forEach(item => {
-          item.items = item.items.filter(item => item.id != event.target.id)
+          item.items = item.items.filter(item => item.id != id)
         });
       }
 

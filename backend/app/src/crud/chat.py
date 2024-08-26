@@ -6,7 +6,7 @@ from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 
-async def get_userllm(*, session: AsyncSession,user_id:int) -> List[chat_schema.GetUserLLM]| None:
+async def get_userllm(*, session: AsyncSession,user_id:uuid.UUID) -> List[chat_schema.GetUserLLM]| None:
     statement = select(UserLLM.id,
                        LLM.source,
                        LLM.name,
@@ -20,7 +20,7 @@ async def get_userllm(*, session: AsyncSession,user_id:int) -> List[chat_schema.
     else:
         return userllm.all()
 
-async def get_llm(*, session: AsyncSession,user_id:int,user_llm_id:int) -> chat_schema.GetUserLLM| None:
+async def get_llm(*, session: AsyncSession,user_id:uuid.UUID,user_llm_id:uuid.UUID) -> chat_schema.GetUserLLM| None:
     statement = select(UserLLM.id,
                        LLM.source,
                        LLM.name,
@@ -42,7 +42,7 @@ async def create_usage(*,session: AsyncSession, usage: chat_schema.Usage) -> Use
     await session.refresh(db_obj)
     return db_obj
     
-async def create_chat(*, session: AsyncSession, current_user: User,title:str,user_llm_id:int) -> Chats:
+async def create_chat(*, session: AsyncSession, current_user: User,title:str,user_llm_id:uuid.UUID) -> Chats:
     chat = Chats(user_id=current_user.id,
                  title=title,
                  user_llm_id=user_llm_id)
@@ -62,7 +62,7 @@ async def create_messages(*, session: AsyncSession, messages:List[Messages]) -> 
     await session.refresh(db_obj)
     return db_obj
 
-async def get_messages(*, session: AsyncSession,current_user: User, chat_id:int) -> List[chat_schema.ReponseMessages]:
+async def get_messages(*, session: AsyncSession,current_user: User, chat_id:uuid.UUID) -> List[chat_schema.ReponseMessages]:
     statement = select(Messages).where(Messages.chat_id == chat_id,
                                        Messages.user_id == current_user.id,
                                        Messages.delete_yn == False)
@@ -74,3 +74,18 @@ async def get_chat_list(*, session: AsyncSession, current_user: User) -> List[ch
                                     Chats.delete_yn == False)
     chats = await session.exec(statement)
     return chats.all()
+
+async def update_chat(*,session: AsyncSession, chat: chat_schema.Update_Chat) -> Chats:
+    db_chat = await session.get(Chats, chat.id)
+    
+    if not db_chat:
+        return None
+    else:
+        update_dict = chat.model_dump(exclude_unset=True)
+        db_chat.sqlmodel_update(update_dict)
+        db_chat.update_date = datetime.now()
+        session.add(db_chat)
+        await session.commit()
+        await session.refresh(db_chat)
+    return db_chat
+    

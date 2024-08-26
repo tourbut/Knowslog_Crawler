@@ -50,8 +50,8 @@
                             {#each menu.items as item}
                             <div style="display: flex; align-items: center;">
                                 <SidebarItem spanClass={spanClass} id={item.id} label={item.label.substring(0,18)+"..."} href={item.herf} on:click={btn_click(item.id)} />
-                                <button on:click={btn_item_more_click}>
-                                    <CloseCircleSolid color="#ca0001" id={item.id}/>
+                                <button on:click={btn_item_more_click(item.id)}>
+                                    <CloseCircleSolid color="#ca0001"/>
                                 </button>
                             </div>
                             <Tooltip target={item.id} placement="bottom">

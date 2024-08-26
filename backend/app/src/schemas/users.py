@@ -1,5 +1,6 @@
 from app.models import *
 from sqlmodel import SQLModel
+import uuid
 
 class UserCreate(SQLModel):
     email: EmailStr | None = Field(default=None, max_length=255)
@@ -19,7 +20,7 @@ class UserDetail(SQLModel):
     interests: str
 
 class UserPublic(SQLModel):
-    id: int
+    id: uuid.UUID 
     username:str
     is_active: bool
     
@@ -30,4 +31,4 @@ class Token(SQLModel):
     token_type: str = "bearer"
 
 class TokenPayload(SQLModel):
-    sub: int | None = None
+    sub: uuid.UUID | None = None

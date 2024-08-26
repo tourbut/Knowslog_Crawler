@@ -3,7 +3,7 @@
     import Sidebar from '$lib/components/common/Sidebar.svelte';
     import { onMount } from 'svelte';
     import ComboModal from "$lib/components/common/Combo_Modal.svelte";
-    import { create_chat, get_userllm,get_chat_list} from "$lib/apis/chat";
+    import { create_chat, get_userllm, get_chat_list, delete_chat} from "$lib/apis/chat";
     import { addToast } from '$lib/common';
 
     let chat_list = []
@@ -42,6 +42,23 @@
     }
     const onclick = async (id) => {
         chat_id = id
+    }
+
+    const closeChat = async (id) => {
+        let params = {
+            id:id
+        }
+        let success_callback = (json) => {
+            addToast('info','삭제 완료')
+            chat_list.forEach(item => {
+            item.items = item.items.filter(item => item.id != id)
+            });
+        }
+        let failure_callback = (json_error) => {
+            addToast('error',json_error.detail)
+        }
+        await delete_chat(params, success_callback, failure_callback);
+        chat_id = ''
     }
 
     async function get_data()
@@ -97,7 +114,7 @@
 
 <div>
     {#if dataLoaded}
-        <Sidebar btn_add_button={createChat} bind:side_menus={chat_list} btn_click={onclick}/>
+        <Sidebar btn_item_more_click={closeChat} btn_add_button={createChat} bind:side_menus={chat_list} btn_click={onclick}/>
     {/if}
 </div> 
 <div class="chat-container">

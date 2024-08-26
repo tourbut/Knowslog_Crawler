@@ -48,7 +48,7 @@ async def login(
         raise HTTPException(status_code=400, detail="Inactive user")
     
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return user_schema.Token(access_token=await security.create_access_token(user.id, expires_delta=access_token_expires),
+    return user_schema.Token(access_token=await security.create_access_token(str(user.id), expires_delta=access_token_expires),
                              username=user.username,
                              is_admin=user.is_admin)
 
@@ -62,7 +62,7 @@ async def get_user(*, session: SessionDep_async, current_user: CurrentUser) -> A
     return current_user
 
 @router.get("/get_userdetail", response_model=user_schema.UserDetail)
-async def get_user(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
+async def get_userdetail(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
     """
     Get User
     """

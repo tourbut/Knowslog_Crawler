@@ -1,8 +1,9 @@
 from app.models import *
 from sqlmodel import SQLModel
+import uuid
 
 class Get_LLM(SQLModel):
-    id:int
+    id:uuid.UUID 
     source: str
     type: str
     name: str
@@ -16,28 +17,28 @@ class Create_Apikey(SQLModel):
     active_yn:bool 
     
 class Get_Apikey(SQLModel):
-    id:int
+    id:uuid.UUID 
     api_name:str
     api_key:str 
     active_yn:bool 
     
 class Get_UserLLM(SQLModel):
-    id:int
+    id:uuid.UUID 
     source:str
     name:str
     api_key:str
     active_yn:bool
 
 class Create_UserLLM(SQLModel):
-    llm_id:int
-    api_id:int
+    llm_id:uuid.UUID 
+    api_id:uuid.UUID 
     active_yn:bool
 
 class Update_UserLLM(SQLModel):
-    id:int
-    llm_id:int
-    api_id:int
+    id:uuid.UUID 
+    llm_id:uuid.UUID 
+    api_id:uuid.UUID 
     active_yn:bool
 
 class Delete_UserLLM(SQLModel):
-    id:int
+    id:uuid.UUID 

@@ -1,3 +1,4 @@
+import uuid
 from typing import Any,List
 
 from fastapi import APIRouter, HTTPException
@@ -78,7 +79,7 @@ async def get_chat_list(*, session: SessionDep_async, current_user: CurrentUser)
     return chats
 
 @router.get("/get_messages",response_model=List[chat_schema.ReponseMessages])
-async def get_messages(*, session: SessionDep_async, current_user: CurrentUser, chat_id:str):
+async def get_messages(*, session: SessionDep_async, current_user: CurrentUser, chat_id:uuid.UUID):
     messages = await chat_crud.get_messages(session=session,current_user=current_user,chat_id=chat_id)
     return messages
 
@@ -86,3 +87,11 @@ async def get_messages(*, session: SessionDep_async, current_user: CurrentUser, 
 async def get_userllm(*, session: SessionDep_async, current_user: CurrentUser):
     userllm = await chat_crud.get_userllm(session=session,user_id=current_user.id)
     return userllm
+
+@router.put("/delete_chat")
+async def delete_chat(*, session: SessionDep_async, current_user: CurrentUser,in_chat:chat_schema.Update_Chat):
+    
+    in_chat.delete_yn = True
+    
+    chat = await chat_crud.update_chat(session=session,chat=in_chat)
+    return {"message":"Chat deleted successfully"}

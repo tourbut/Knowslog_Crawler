@@ -1,10 +1,12 @@
+import uuid
+
 from typing import List
 from app.models import *
 from app.src.schemas import archive as archive_schema
 from sqlmodel import select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
-async def get_archive(*,session: AsyncSession,user_id:int,archive_id:int) -> Archive| None:
+async def get_archive(*,session: AsyncSession,user_id:uuid.UUID,archive_id:uuid.UUID) -> Archive| None:
     query = select(Archive).where(Archive.user_id == user_id,
                                   Archive.id == archive_id,
                                   Archive.delete_yn == False)
@@ -14,7 +16,7 @@ async def get_archive(*,session: AsyncSession,user_id:int,archive_id:int) -> Arc
     else:
         return archive.first()
 
-async def get_refine(*,session: AsyncSession,user_id:int,archive_id:int) -> List[Refine]| None:
+async def get_refine(*,session: AsyncSession,user_id:uuid.UUID,archive_id:uuid.UUID) -> List[Refine]| None:
     query = select(Refine).where(Refine.user_id == user_id,
                                  Refine.archive_id == archive_id)
     refine = await session.exec(query)
@@ -23,7 +25,7 @@ async def get_refine(*,session: AsyncSession,user_id:int,archive_id:int) -> List
     else:
         return refine.all()
 
-async def get_archive_list(*,session: AsyncSession,user_id:int) -> Archive:
+async def get_archive_list(*,session: AsyncSession,user_id:uuid.UUID) -> Archive:
     query = select(Archive.id,
                    Archive.category,
                    Archive.title,
@@ -35,7 +37,7 @@ async def get_archive_list(*,session: AsyncSession,user_id:int) -> Archive:
     else:
         return archive.all()
 
-async def get_userllm(*, session: AsyncSession,user_id:int) -> archive_schema.GetUserLLM| None:
+async def get_userllm(*, session: AsyncSession,user_id:uuid.UUID) -> archive_schema.GetUserLLM| None:
     statement = select(UserLLM.id,
                        LLM.source,
                        LLM.name,
@@ -49,7 +51,7 @@ async def get_userllm(*, session: AsyncSession,user_id:int) -> archive_schema.Ge
     else:
         return userllm.first()
 
-async def create_archive(*,session: AsyncSession, archive: archive_schema.Archive,user_id:int) -> Archive:
+async def create_archive(*,session: AsyncSession, archive: archive_schema.Archive,user_id:uuid.UUID) -> Archive:
     try:
         db_obj = Archive.model_validate(archive, update={"user_id":user_id})
         session.add(db_obj)

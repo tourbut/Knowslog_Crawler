@@ -1,4 +1,5 @@
 from sqlmodel import SQLModel
+import uuid
 
 class ArchiveURL(SQLModel):
     url: str
@@ -16,17 +17,17 @@ class Archive(SQLModel):
     dom : str
 
 class Refine(SQLModel):
-    user_id: int 
+    user_id: uuid.UUID  
     work_cd: str
     content: str 
 
 class Usage(SQLModel):
-    user_llm_id: int 
+    user_llm_id: uuid.UUID  
     input_token:int 
     output_token:int
     
 class ResponseArchive(SQLModel):
-    id: int
+    id: uuid.UUID 
     category: str
     language: str
     title: str 
@@ -42,19 +43,19 @@ class ResponseArchive(SQLModel):
     dom : str
 
 class ArchiveList(SQLModel):
-    id: int
+    id: uuid.UUID 
     category: str
     title: str
     url:str
     
 class GetUserLLM(SQLModel):
-    id: int
+    id: uuid.UUID 
     source: str
     name: str
     api_key: str
     
 class Update_Archive(SQLModel):
-    id: int
+    id: uuid.UUID 
     category: str|None = None
     language: str|None = None
     title: str|None = None

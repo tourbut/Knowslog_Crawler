@@ -28,7 +28,7 @@ async def create_user(*, session: Session, user_create: user_schema.UserCreate) 
     return db_obj
 
 
-async def update_detail(*, session: Session, user_detail: user_schema.UserDetail, user_id: int) -> User:
+async def update_detail(*, session: Session, user_detail: user_schema.UserDetail, user_id: uuid.UUID) -> User:
     detail = await session.get(User, user_id)
     
     if not detail:
