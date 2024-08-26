@@ -9,7 +9,7 @@ class CommonBase(SQLModel):
     delete_yn: bool = Field(default=False)
 
 class User(CommonBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
     username: str = Field(unique=True, nullable=False, description="유저ID")
     password: str = Field(nullable=False, description="비밀번호")
     email: EmailStr = Field(unique=True, index=True, max_length=255,description="이메일")
@@ -22,7 +22,7 @@ class User(CommonBase, table=True):
     is_admin: bool = Field(default=False,description="관리자여부")
 
 class LLM(CommonBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
     source: str = Field(nullable=False)
     type: str = Field(nullable=False)
     name: str = Field(nullable=False)
@@ -32,29 +32,29 @@ class LLM(CommonBase, table=True):
     is_active: bool = Field(default=True)
 
 class UserAPIKey(CommonBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id")
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
+    user_id: uuid.UUID = Field(foreign_key="user.id")
     api_name:str = Field(nullable=False)
     api_key:str = Field(nullable=False)
     active_yn:bool = Field(default=True)
 
 class UserLLM(CommonBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id")
-    llm_id: int = Field(foreign_key="llm.id")
-    api_id: int = Field(foreign_key="userapikey.id")
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
+    user_id: uuid.UUID = Field(foreign_key="user.id")
+    llm_id: uuid.UUID = Field(foreign_key="llm.id")
+    api_id: uuid.UUID = Field(foreign_key="userapikey.id")
     active_yn:bool = Field(default=True)
 
 class UserUsage(CommonBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    user_llm_id: int = Field(foreign_key="userllm.id")
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
+    user_llm_id: uuid.UUID = Field(foreign_key="userllm.id")
     usage_date:datetime = Field(default=datetime.now())
     input_token:int = Field(nullable=False)
     output_token:int = Field(nullable=False)
 
 class Archive(CommonBase, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    user_id: int = Field(foreign_key="user.id")
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
+    user_id: uuid.UUID = Field(foreign_key="user.id")
     category: str = Field(nullable=False)
     language: str = Field(nullable=False)
     title: str | None = Field(nullable=True)
@@ -64,49 +64,49 @@ class Archive(CommonBase, table=True):
     dom: str | None = Field(nullable=True)
 
 class Refine(CommonBase, table=True):
-    id: int | None = Field(default=None, primary_key=True, description="ID")
-    archive_id: int = Field(foreign_key="archive.id", nullable=False, description="아카이브ID")
-    user_id: int = Field(foreign_key="user.id", nullable=False, description="유저ID")
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
+    archive_id: uuid.UUID = Field(foreign_key="archive.id", nullable=False, description="아카이브ID")
+    user_id: uuid.UUID = Field(foreign_key="user.id", nullable=False, description="유저ID")
     work_cd: str = Field(nullable=False, description="작업코드")
     content: str = Field(nullable=False, description="내용")
     
 class UserPrompt(CommonBase,table=True):
-    user_id: int = Field(foreign_key="user.id", primary_key=True)
-    id: int | None = Field(default=None, primary_key=True)
+    user_id: uuid.UUID = Field(foreign_key="user.id", primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
     instruct_prompt: str | None = Field(nullable=True)
     response_prompt: str | None = Field(nullable=True)
 
 class SystemPrompt(CommonBase,table=True):
-    id: int | None = Field(default=None, primary_key=True, description="ID")
-    user_id: int = Field(foreign_key="user.id", description="유저ID")
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
+    user_id: uuid.UUID = Field(foreign_key="user.id", description="유저ID")
     work_cd: str = Field(nullable=False, description="작업코드")
     description: str | None = Field(nullable=True, description="설명")
     instruct_prompt: str | None = Field(nullable=True, description="지시 프롬프트")
     response_prompt: str | None = Field(nullable=True, description="응답 프롬프트")
 
 class ClsfCode(CommonBase,table=True):
-    id: int | None = Field(default=None, primary_key=True, description="ID")
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
     clsf_cd: str = Field(nullable=False, description="분류코드")
     clsf_nm: str = Field(nullable=False, description="분류명")
     clsf_desc: str | None = Field(nullable=True, description="분류설명")
 
 class CommonCode(CommonBase,table=True):
-    id: int | None = Field(default=None, primary_key=True, description="ID")
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
     clsf_cd: str = Field(nullable=False, description="분류코드")
     code: str = Field(nullable=False, description="코드")
     code_nm: str = Field(nullable=False, description="코드명")
     code_desc: str | None = Field(nullable=True, description="코드설명")
 
 class Chats(CommonBase,table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    user_id: int = Field(foreign_key="user.id", description="유저ID")
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
+    user_id: uuid.UUID  = Field(foreign_key="user.id", description="유저ID")
     title: str = Field(nullable=False, description="채팅명")
-    user_llm_id: int = Field(foreign_key="userllm.id", description="유저LLMID")
+    user_llm_id: uuid.UUID  = Field(foreign_key="userllm.id", description="유저LLMID")
 
 class Messages(CommonBase,table=True):
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
     chat_id: uuid.UUID = Field(foreign_key="chats.id", description="채팅ID")
-    user_id: int = Field(foreign_key="user.id", description="유저ID")
+    user_id: uuid.UUID  = Field(foreign_key="user.id", description="유저ID")
     name:str = Field(nullable=False, description="이름")
     content: str = Field(nullable=False, description="내용")
     is_user: bool = Field(nullable=False, description="유저여부")
