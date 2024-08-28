@@ -19,7 +19,7 @@ from app.models import User
 from app.src.schemas.users import TokenPayload
 
 engine = create_engine(str(settings.SQLALCHEMY_DATABASE_URI))
-async_engine = create_async_engine(str(settings.SQLALCHEMY_DATABASE_URI))
+async_engine = create_async_engine(str(settings.SQLALCHEMY_DATABASE_URI_ASYNC))
 
 def get_db() -> Generator[Session, None, None]:
     with Session(engine) as session:
