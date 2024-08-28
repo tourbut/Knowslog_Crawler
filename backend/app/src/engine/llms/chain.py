@@ -5,9 +5,11 @@ from .prompt import get_translate_prompt, get_summary_prompt,get_chatbot_prompt
 from .parser import strparser
 
 from langchain.globals import set_llm_cache
-from langchain_community.cache import SQLiteCache
+from langchain_community.cache import SQLiteCache, SQLAlchemyCache
+from ...deps import engine
+#set_llm_cache(SQLiteCache(database_path=".langchain.db"))
+set_llm_cache(SQLAlchemyCache(engine))
 
-set_llm_cache(SQLiteCache(database_path=".langchain.db"))
 
 def translate_chain(api_key:str,
                     model:str='gpt-4o-mini',
