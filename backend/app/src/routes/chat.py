@@ -12,31 +12,47 @@ from app.core.config import settings
 from app.src.engine.llms.chain import translate_chain,summarize_chain,chatbot_chain
 from datetime import datetime
 from requests.exceptions import RequestException
-
+from langchain_redis import RedisChatMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.messages import (
+    AIMessage,
+    BaseMessage,
+    HumanMessage,
+)
 router = APIRouter()
 
+REDIS_URL = settings.REDIS_URL
+
+# Function to get or create a RedisChatMessageHistory instance
+def get_redis_history(session_id: str) -> BaseChatMessageHistory:
+    return RedisChatMessageHistory(session_id, redis_url=REDIS_URL)
 
 @router.post("/send_message",response_model=chat_schema.OutMessage)
 async def send_message(*, session: SessionDep_async, current_user: CurrentUser,chat_in: chat_schema.SendMessage):
-    
     userllm = await chat_crud.get_llm(session=session,user_id=current_user.id,user_llm_id=chat_in.user_llm_id)
     
-    messages = []
+    history = get_redis_history(chat_in.chat_id.hex)
+    # Retrieve messages
+    print("Chat History:")
+    for message in history.messages:
+        print(f"{type(message).__name__}: {message.content}")
     user_message = chat_schema.CreateMessage(user_id=current_user.id,
                                              chat_id=chat_in.chat_id,
                                              name=current_user.name,
                                              content=chat_in.input,
                                              is_user=True)
+    messages = []
     messages.append(user_message)
     
     async def chain_astream(input):
     
         chain = chatbot_chain(api_key=userllm.api_key,
-                              model=userllm.name)
+                              model=userllm.name,
+                              get_redis_history=get_redis_history)
         
         chunks=[]
         
-        async for chunk in chain.astream({'input':input}):
+        async for chunk in chain.astream({'input':input},config={"configurable": {"session_id": chat_in.chat_id.hex}}):
             chunks.append(chunk)
             yield chat_schema.OutMessage(content=chunk.content,
                                          input_token=chunk.usage_metadata['input_tokens'] if chunk.usage_metadata is not None else None,
@@ -47,8 +63,6 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
         
         for chunk in chunks[1:]:
             response+=chunk
-        print(response.content)
-        
         
         bot_message = chat_schema.CreateMessage(user_id=current_user.id,
                         chat_id=chat_in.chat_id,
@@ -56,10 +70,19 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
                         content=response.content,
                         is_user=False)
         
+
+            
         messages.append(bot_message)
 
+        usage = chat_schema.Usage(user_llm_id=chat_in.user_llm_id,
+                                  input_token=response.usage_metadata['input_tokens'],
+                                  output_token=response.usage_metadata['output_tokens'])
         
-        await chat_crud.create_messages(session=session,messages=messages)
+        await chat_crud.create_messages(session=session,messages=messages,usage=usage)
+        
+        # Add messages to chat history
+        await history.aadd_messages([HumanMessage(user_message.content)])
+        await history.aadd_messages([AIMessage(content=str(bot_message.content))])
         
         yield chat_schema.OutMessage(content=response.content,
                                     input_token=response.usage_metadata['input_tokens'],
@@ -89,9 +112,15 @@ async def get_userllm(*, session: SessionDep_async, current_user: CurrentUser):
     return userllm
 
 @router.put("/delete_chat")
-async def delete_chat(*, session: SessionDep_async, current_user: CurrentUser,in_chat:chat_schema.Update_Chat):
+async def delete_chat(*, session: SessionDep_async, current_user: CurrentUser,chat_in:chat_schema.Update_Chat):
+    history = RedisChatMessageHistory(session_id=chat_in.id.hex, redis_url=REDIS_URL)
+    history.clear()
+    chat_in.delete_yn = True
     
-    in_chat.delete_yn = True
-    
-    chat = await chat_crud.update_chat(session=session,chat=in_chat)
+    chat = await chat_crud.update_chat(session=session,chat=chat_in)
     return {"message":"Chat deleted successfully"}
+
+@router.get("/get_chat",response_model=chat_schema.GetChat)
+async def get_chat(*, session: SessionDep_async, current_user: CurrentUser,chat_id:uuid.UUID):
+    chat = await chat_crud.get_chat(session=session,chat_id=chat_id)
+    return chat

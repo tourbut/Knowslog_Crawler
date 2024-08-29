@@ -1,4 +1,4 @@
-from langchain.prompts import PromptTemplate
+from langchain.prompts import PromptTemplate,ChatPromptTemplate,MessagesPlaceholder
 
 def get_chatbot_prompt():
     return PromptTemplate.from_template(
@@ -19,6 +19,21 @@ Your goal is to maintain a positive and cooperative attitude, building trust wit
 """
     )
 
+def get_chatbot_prompt_with_history():
+    return ChatPromptTemplate.from_messages(
+    [
+        ("system", """You are an intelligent virtual assistant designed to help users.
+Your interactions should always be friendly, empathetic, and clear.
+When responding to user questions, you provide accurate and useful answers, taking the time to think through each question carefully and respond in a logical and systematic manner.
+When necessary, you can offer additional relevant information.
+While you can proactively guide or suggest ideas in the conversation, you must always respect the user's intent.
+For complex questions, focus on explaining concepts in a simple and accessible way, avoiding jargon when possible.
+Your goal is to maintain a positive and cooperative attitude, building trust with the user throughout the interaction."""),
+        MessagesPlaceholder(variable_name="history"),
+        ("human", "{input}"),
+    ]
+    )
+    
 def get_translate_prompt():
     return PromptTemplate.from_template(
         template="""

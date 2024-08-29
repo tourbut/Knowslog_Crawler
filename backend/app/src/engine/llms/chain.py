@@ -1,14 +1,16 @@
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
+from langchain_core.runnables.history import RunnableWithMessageHistory
 
-from .prompt import get_translate_prompt, get_summary_prompt,get_chatbot_prompt
+from .prompt import get_translate_prompt, get_summary_prompt,get_chatbot_prompt,get_chatbot_prompt_with_history
 from .parser import strparser
 
 from langchain.globals import set_llm_cache
 from langchain_community.cache import SQLiteCache, SQLAlchemyCache
-from ...deps import engine
-#set_llm_cache(SQLiteCache(database_path=".langchain.db"))
-set_llm_cache(SQLAlchemyCache(engine))
+#from ...deps import engine
+#set_llm_cache(SQLAlchemyCache(engine))
+
+set_llm_cache(SQLiteCache(database_path=".cache.db"))
 
 
 def translate_chain(api_key:str,
@@ -52,12 +54,14 @@ def summarize_chain(api_key:str,
     return chain
 
 
+
 def chatbot_chain(api_key:str,
                   model:str='gpt-4o-mini',
                   temperature:float=0.7,
-                  callback_manager=None):
+                  callback_manager=None,
+                  get_redis_history=None):
     
-    prompt = get_chatbot_prompt()
+    prompt = get_chatbot_prompt_with_history()
     
     if model.startswith('gpt'):
         llm = ChatOpenAI(model=model,
@@ -75,4 +79,11 @@ def chatbot_chain(api_key:str,
         raise ValueError(f"Invalid model name: {model}")
     
     chain = prompt|llm
-    return chain
+
+
+    # Create a runnable with message history
+    chain_with_history = RunnableWithMessageHistory(
+    chain, get_redis_history, input_messages_key="input", history_messages_key="history"
+    )
+    
+    return chain_with_history

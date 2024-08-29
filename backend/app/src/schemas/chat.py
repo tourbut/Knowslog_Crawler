@@ -68,3 +68,9 @@ class Update_Chat(SQLModel):
     id: uuid.UUID
     title: str|None = None
     delete_yn: bool|None = None
+    
+class Usage(SQLModel):
+    user_llm_id: uuid.UUID  
+    input_token:int 
+    output_token:int
+    
