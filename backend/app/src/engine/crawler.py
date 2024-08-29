@@ -17,7 +17,7 @@ def _get_meta(url,dom):
         title_tag = dom.find('meta', {'name': 'title'})
         author_tag = dom.find('meta', {'name': 'author'})
         url = url_tag['content'] if url=="" else url
-        title = title_tag['content'] if title_tag else ''
+        title = title_tag['content'] if title_tag else dom.title.string
         author = author_tag['content'] if author_tag else ''
         
         return url,title,author
@@ -40,12 +40,12 @@ def _parse_dom(node):
 
     if isinstance(node, Tag):
         #print(node.name)
-        if node.name in ["script", "style",'html','meta','head','body','div','main','figure','header','article']:
+        if node.name in ["script", "style",'html','meta','head','body','div','main','figure','header','article','p']:
             for child in node.children:
                 child_content = _parse_dom(child)
                 if child_content:
                     parsed_content.append(child_content)
-        elif node.name == "link":
+        elif node.name in ["link","a"]:
             href = node.get('href')
             if href and href.startswith("http"):
                 parsed_content.append(f"[Link]({href.strip()})\n")
