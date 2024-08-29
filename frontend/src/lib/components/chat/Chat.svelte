@@ -1,7 +1,6 @@
 <script>
     import { Navbar, NavBrand, NavLi, NavUl, NavHamburger, Dropdown, DropdownItem, DropdownDivider } from 'flowbite-svelte';
     import { ChevronDownOutline } from 'flowbite-svelte-icons';
-    import { onMount } from 'svelte';
 
     import MessageInput from "./MessageInput.svelte";
     import Message from "./Message.svelte";
@@ -65,7 +64,6 @@
                 message_list[message_list.length-1].msg += json.content
             }
         }
-        console.log(params)
         await send_message(params, success_callback, failure_callback,streamCallback);
     }
 
@@ -89,11 +87,17 @@
         await get_messages(params, success_callback, failure_callback);
     }
 
-    $: {
-        if (chat_id) {
+    let messageListElement;
+    
+    $: if (chat_id) {
             get_data();
         }
-    }
+
+    $ : if (message_list.length > 0) {
+            requestAnimationFrame(() => {
+            messageListElement.scrollTop = messageListElement.scrollHeight;
+            });
+        }
 
 </script>
 <div >
@@ -112,7 +116,7 @@
       </Navbar>
 </div>
 <div class="flex flex-col gap-4">
-    <div class="message-container">
+    <div class="message-container" bind:this={messageListElement}>
         {#each message_list as message}
             <Message bind:message={message}/>
         {/each}
