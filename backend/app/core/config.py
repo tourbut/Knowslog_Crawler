@@ -130,6 +130,12 @@ class Settings(BaseSettings):
     
     #Crawler 관련 설정
     SSL_VERIFY: bool = True
+    
+    REDIS_SERVER: str
+    REDIS_PORT: str = "6379"
 
+    @property
+    def REDIS_URL(self) -> str:
+        return f"redis://{self.REDIS_SERVER}:{self.REDIS_PORT}"
 
 settings = Settings()  # type: ignore
