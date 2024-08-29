@@ -26,7 +26,7 @@ def get_translate_prompt():
 Translate the text entered in <DOCUMENT> perfectly into Korean.
 Be careful not to omit any content.
 Keep the links within the document intact.
-The final output format should be fixed in Markdown.
+The final output format should be fixed in Markdown.(Do not use markdown in the initial starting phrase)
 </INSTRUCTION>
 <DOCUMENT>
 {document}
