@@ -62,6 +62,13 @@ services:
       - knowslog-public
     depends_on:
       - backend
+  redis:
+    container_name: redis
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379"
+    networks:
+      - knowslog-public
 
   certbot:
     container_name: certbot
