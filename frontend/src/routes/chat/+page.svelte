@@ -3,7 +3,7 @@
     import Sidebar from '$lib/components/common/Sidebar.svelte';
     import { onMount } from 'svelte';
     import ComboModal from "$lib/components/common/Combo_Modal.svelte";
-    import { create_chat, get_userllm, get_chat_list, delete_chat} from "$lib/apis/chat";
+    import { create_chat, get_userllm, get_chat_list, delete_chat, get_chat} from "$lib/apis/chat";
     import { addToast } from '$lib/common';
 
     let chat_list = []
@@ -11,10 +11,12 @@
     let showModal = false;
     let dataLoaded = false;
     let userllm_list = []
+    let selected_userllm={value:0,name:"모델선택"}
     let table_head=[
         {id:0,name:"userllm_id",type:"combo",desc:"모델선택",combo:userllm_list},
         {id:1,name:"title",type:"text",desc:"채팅방명"}
     ];
+
 
     let form_data={}
 
@@ -23,7 +25,6 @@
     }
 
     const btn_create_chat = async () => {
-        console.log("create chat") 
         showModal = false;
 
         let params = {
@@ -42,6 +43,19 @@
     }
     const onclick = async (id) => {
         chat_id = id
+
+        let params = {
+            chat_id:id
+        }
+
+        let success_callback = (json) => {
+            selected_userllm = userllm_list.find(item => item.value == json.user_llm_id)
+        }
+        let failure_callback = (json_error) => {
+            addToast('error',json_error.detail)
+        }
+        await get_chat(params, success_callback, failure_callback);
+
     }
 
     const closeChat = async (id) => {
@@ -119,7 +133,7 @@
 </div> 
 <div class="chat-container">
     {#if chat_id}
-        <Chat bind:chat_id={chat_id} bind:userllm_list={userllm_list}/>
+        <Chat bind:chat_id={chat_id} bind:userllm_list={userllm_list} bind:selected_userllm={selected_userllm}/>
     {/if}
 </div>
 
@@ -131,7 +145,8 @@
         margin-left: auto;           /* 좌우 중앙 정렬 */
         margin-right: auto;          /* 좌우 중앙 정렬 */
         padding: 1rem;               /* padding: 1rem (Tailwind의 p-4에 해당) */
-        min-height: 100vh;           /* 브라우저 높이와 동일하게 설정 */
+        min-height: 90vh;           /* 브라우저 높이와 동일하게 설정 */
+        max-height: 90vh;           /* 브라우저 높이와 동일하게 설정 */
         max-width: 64rem;            /* 최대 너비 64rem (Tailwind의 max-w-5xl에 해당) */
     }
 </style>

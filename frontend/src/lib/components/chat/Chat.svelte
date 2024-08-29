@@ -10,9 +10,10 @@
 
     export let userllm_list = []
     export let chat_id = ''
+    export let selected_userllm={value:0,name:"모델선택"}
+    
     let message_list= []
     let user_msg = '';
-    let selected_userllm={value:0,name:"모델선택"}
     
     const sendMessage = async () => {
         if (user_msg == '') {
@@ -69,15 +70,12 @@
     }
 
     async function get_data()
-    {
-        console.log(chat_id)
-        
+    {        
         let params = {
             chat_id: chat_id
         }
 
         let success_callback = (json) => {
-            console.log(json)
             message_list = json.map(item => {return {
                 name:item.name,
                 msg:item.content,
@@ -89,7 +87,6 @@
             addToast('error',json_error.detail)
         }
         await get_messages(params, success_callback, failure_callback);
-
     }
 
     $: {
@@ -128,8 +125,8 @@
         display: flex;
         flex-direction: column;
         gap: 1rem;                /* Tailwind의 gap-4 */
-        max-height: 80vh;         /* 최대 높이 설정 (필요에 따라 조정 가능) */
-        min-height: 80vh;         /* 최소 높이 설정 (필요에 따라 조정 가능) */
+        max-height: 70vh;         /* 최대 높이 설정 (필요에 따라 조정 가능) */
+        min-height: 70vh;         /* 최소 높이 설정 (필요에 따라 조정 가능) */
         overflow-y: auto;         /* 내용이 넘칠 경우 수직 스크롤바 표시 */
     }
 </style>
