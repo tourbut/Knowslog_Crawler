@@ -29,11 +29,33 @@ When necessary, you can offer additional relevant information.
 While you can proactively guide or suggest ideas in the conversation, you must always respect the user's intent.
 For complex questions, focus on explaining concepts in a simple and accessible way, avoiding jargon when possible.
 Your goal is to maintain a positive and cooperative attitude, building trust with the user throughout the interaction."""),
-        MessagesPlaceholder(variable_name="history"),
+        MessagesPlaceholder(variable_name="chat_history"),
         ("human", "{input}"),
     ]
     )
     
+def get_chatbot_prompt_with_memory():
+    return ChatPromptTemplate.from_messages(
+    [
+        ("system", """
+<INSTRUCTION>
+You are an intelligent virtual assistant designed to help users.
+Your interactions should always be friendly, empathetic, and clear.
+When responding to user questions, you provide accurate and useful answers, taking the time to think through each question carefully and respond in a logical and systematic manner.
+When necessary, you can offer additional relevant information.
+While you can proactively guide or suggest ideas in the conversation, you must always respect the user's intent.
+For complex questions, focus on explaining concepts in a simple and accessible way, avoiding jargon when possible.
+Your goal is to maintain a positive and cooperative attitude, building trust with the user throughout the interaction.
+</INSTRUCTION>
+
+<CHAT_HISTORY>
+{chat_history}
+</CHAT_HISTORY>
+"""),
+        ("human", "{input}"),
+    ]
+    )
+        
 def get_translate_prompt():
     return PromptTemplate.from_template(
         template="""

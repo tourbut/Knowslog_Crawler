@@ -3,13 +3,13 @@ from typing import Any,List
 
 from fastapi import APIRouter, HTTPException
 
-from app.src.deps import SessionDep_async,CurrentUser
+from app.src.deps import SessionDep_async,CurrentUser,async_engine,engine
 from app.src.crud import chat as chat_crud
 from app.src.schemas import chat as chat_schema
 from fastapi.responses import StreamingResponse
-from langchain_core.messages import AIMessageChunk
 from app.core.config import settings
 from app.src.engine.llms.chain import translate_chain,summarize_chain,chatbot_chain
+from app.src.engine.llms.memory import pg_vetorstore_with_memory
 from datetime import datetime
 from requests.exceptions import RequestException
 from langchain_redis import RedisChatMessageHistory
@@ -29,13 +29,20 @@ def get_redis_history(session_id: str) -> BaseChatMessageHistory:
 
 @router.post("/send_message",response_model=chat_schema.OutMessage)
 async def send_message(*, session: SessionDep_async, current_user: CurrentUser,chat_in: chat_schema.SendMessage):
+    
+    # Get userllm
     userllm = await chat_crud.get_llm(session=session,user_id=current_user.id,user_llm_id=chat_in.user_llm_id)
     
+    # Get a postgres vectorstore with memory
+    memory = pg_vetorstore_with_memory(connection=engine,
+                                       collection_name=chat_in.chat_id.hex,
+                                       api_key=userllm.api_key,
+                                       model="text-embedding-3-large",
+                                       search_kwargs={"k": 1})
+    
+    # Get or create a RedisChatMessageHistory instance
     history = get_redis_history(chat_in.chat_id.hex)
-    # Retrieve messages
-    print("Chat History:")
-    for message in history.messages:
-        print(f"{type(message).__name__}: {message.content}")
+    
     user_message = chat_schema.CreateMessage(user_id=current_user.id,
                                              chat_id=chat_in.chat_id,
                                              name=current_user.name,
@@ -48,11 +55,13 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
     
         chain = chatbot_chain(api_key=userllm.api_key,
                               model=userllm.name,
-                              get_redis_history=get_redis_history)
+                              #get_redis_history=get_redis_history
+                              memory=memory
+                              )
         
         chunks=[]
         
-        async for chunk in chain.astream({'input':input},config={"configurable": {"session_id": chat_in.chat_id.hex}}):
+        async for chunk in chain.astream({'input':input}):
             chunks.append(chunk)
             yield chat_schema.OutMessage(content=chunk.content,
                                          input_token=chunk.usage_metadata['input_tokens'] if chunk.usage_metadata is not None else None,
@@ -70,8 +79,6 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
                         content=response.content,
                         is_user=False)
         
-
-            
         messages.append(bot_message)
 
         usage = chat_schema.Usage(user_llm_id=chat_in.user_llm_id,
@@ -81,8 +88,25 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
         await chat_crud.create_messages(session=session,messages=messages,usage=usage)
         
         # Add messages to chat history
-        await history.aadd_messages([HumanMessage(user_message.content)])
-        await history.aadd_messages([AIMessage(content=str(bot_message.content))])
+        await history.aadd_messages([HumanMessage(content=user_message.content,
+                                                  additional_kwargs={
+                                                      "user_id":str(user_message.user_id),
+                                                      "name":user_message.name
+                                                      }),])
+        await history.aadd_messages([AIMessage(content=str(bot_message.content),
+                                               additional_kwargs={
+                                                   "user_id":str(bot_message.user_id),
+                                                   "name":bot_message.name
+                                                   })])
+        
+        memory.save_context(
+            inputs={
+                "human": user_message.content
+                },
+            outputs={
+                "ai": bot_message.content
+                },
+            )
         
         yield chat_schema.OutMessage(content=response.content,
                                     input_token=response.usage_metadata['input_tokens'],
@@ -103,6 +127,7 @@ async def get_chat_list(*, session: SessionDep_async, current_user: CurrentUser)
 
 @router.get("/get_messages",response_model=List[chat_schema.ReponseMessages])
 async def get_messages(*, session: SessionDep_async, current_user: CurrentUser, chat_id:uuid.UUID):
+    history = get_redis_history(chat_id.hex)
     messages = await chat_crud.get_messages(session=session,current_user=current_user,chat_id=chat_id)
     return messages
 

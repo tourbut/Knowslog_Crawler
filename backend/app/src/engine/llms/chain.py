@@ -1,8 +1,10 @@
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.history import RunnableWithMessageHistory
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from operator import itemgetter
 
-from .prompt import get_translate_prompt, get_summary_prompt,get_chatbot_prompt,get_chatbot_prompt_with_history
+from .prompt import get_translate_prompt, get_summary_prompt,get_chatbot_prompt,get_chatbot_prompt_with_history,get_chatbot_prompt_with_memory
 from .parser import strparser
 
 from langchain.globals import set_llm_cache
@@ -59,9 +61,8 @@ def chatbot_chain(api_key:str,
                   model:str='gpt-4o-mini',
                   temperature:float=0.7,
                   callback_manager=None,
-                  get_redis_history=None):
-    
-    prompt = get_chatbot_prompt_with_history()
+                  get_redis_history=None,
+                  memory=None):
     
     if model.startswith('gpt'):
         llm = ChatOpenAI(model=model,
@@ -78,12 +79,23 @@ def chatbot_chain(api_key:str,
     else:
         raise ValueError(f"Invalid model name: {model}")
     
-    chain = prompt|llm
-
-
-    # Create a runnable with message history
-    chain_with_history = RunnableWithMessageHistory(
-    chain, get_redis_history, input_messages_key="input", history_messages_key="history"
-    )
+    if get_redis_history:
+        prompt = get_chatbot_prompt_with_history()
+        chain = prompt|llm
+        # Create a runnable with message history
+        chain_with_history = RunnableWithMessageHistory(
+        chain, get_redis_history, input_messages_key="input", history_messages_key="history"
+        )    
+        return chain_with_history
     
-    return chain_with_history
+    elif memory:
+        runnable = RunnablePassthrough.assign(
+        chat_history=RunnableLambda(memory.load_memory_variables)
+        | itemgetter("chat_history")  # memory_key 와 동일하게 입력합니다.
+        )
+        prompt = get_chatbot_prompt_with_memory()
+        return runnable|prompt|llm
+    else:
+        prompt = get_chatbot_prompt()
+        chain = prompt|llm
+        return chain
