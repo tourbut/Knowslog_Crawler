@@ -94,9 +94,7 @@
         }
 
     $ : if (message_list.length > 0) {
-            requestAnimationFrame(() => {
             messageListElement.scrollTop = messageListElement.scrollHeight;
-            });
         }
 
 </script>
