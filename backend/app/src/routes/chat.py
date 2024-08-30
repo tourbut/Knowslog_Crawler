@@ -91,12 +91,14 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
         await history.aadd_messages([HumanMessage(content=user_message.content,
                                                   additional_kwargs={
                                                       "user_id":str(user_message.user_id),
-                                                      "name":user_message.name
+                                                      "name":user_message.name,
+                                                      "create_date":user_message.create_date.strftime("%Y-%m-%d %H:%M:%S")
                                                       }),])
         await history.aadd_messages([AIMessage(content=str(bot_message.content),
                                                additional_kwargs={
                                                    "user_id":str(bot_message.user_id),
-                                                   "name":bot_message.name
+                                                   "name":bot_message.name,
+                                                   "create_date":bot_message.create_date.strftime("%Y-%m-%d %H:%M:%S")
                                                    })])
         
         memory.save_context(
@@ -127,8 +129,23 @@ async def get_chat_list(*, session: SessionDep_async, current_user: CurrentUser)
 
 @router.get("/get_messages",response_model=List[chat_schema.ReponseMessages])
 async def get_messages(*, session: SessionDep_async, current_user: CurrentUser, chat_id:uuid.UUID):
+    
+    # Redis에서 메시지를 가져오는 코드
     history = get_redis_history(chat_id.hex)
-    messages = await chat_crud.get_messages(session=session,current_user=current_user,chat_id=chat_id)
+    messages = []
+    for message in history.messages:
+        msg = chat_schema.ReponseMessages(
+            chat_id=chat_id,
+            name=message.additional_kwargs["name"],
+            content=message.content,
+            is_user=message.type == "human",
+            create_date=datetime.strptime(message.additional_kwargs["create_date"],"%Y-%m-%d %H:%M:%S")
+        )
+        messages.append(msg)
+    
+    # DB에서 메시지를 가져오는 코드    
+    #messages = await chat_crud.get_messages(session=session,current_user=current_user,chat_id=chat_id)
+    
     return messages
 
 @router.get("/get_userllm",response_model=List[chat_schema.GetUserLLM])

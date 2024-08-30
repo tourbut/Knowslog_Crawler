@@ -42,7 +42,6 @@ class GetMessages(SQLModel):
 
 class ReponseMessages(SQLModel):
     chat_id: uuid.UUID
-    id: uuid.UUID
     name:str
     content: str
     is_user: bool
@@ -54,6 +53,8 @@ class CreateMessage(SQLModel):
     name: str 
     content: str
     is_user: bool
+    create_date: datetime= datetime.now()
+    
     
 class Chat(SQLModel):
     category: str
