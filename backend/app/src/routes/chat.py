@@ -8,7 +8,12 @@ from app.src.crud import chat as chat_crud
 from app.src.schemas import chat as chat_schema
 from fastapi.responses import StreamingResponse
 from app.core.config import settings
-from app.src.engine.llms.chain import translate_chain,summarize_chain,chatbot_chain
+from app.src.engine.llms.chain import (
+    translate_chain,
+    summarize_chain,
+    chatbot_chain,
+    thinking_chatbot_chain
+)
 from app.src.engine.llms.memory import pg_vetorstore_with_memory
 from datetime import datetime
 from requests.exceptions import RequestException
@@ -53,7 +58,7 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
     
     async def chain_astream(input):
     
-        chain = chatbot_chain(api_key=userllm.api_key,
+        chain = thinking_chatbot_chain(api_key=userllm.api_key,
                               model=userllm.name,
                               #get_redis_history=get_redis_history
                               memory=memory
