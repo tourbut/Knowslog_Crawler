@@ -31,9 +31,18 @@
             title:form_data['title'],
             user_llm_id:form_data['userllm_id']
         }
-
+        
         let success_callback = (json) => {
-            console.log(json)
+
+            addToast('info','생성 완료')
+            selected_userllm = userllm_list.find(item => item.value == json.user_llm_id)
+            chat_id = json.id
+            chat_list[0].items.push({
+                id: json.id,
+                label: json.title,  // title이 없을 경우 'Untitled'로 설정
+                herf: '',            // id 기반 URL 설정
+                caption: ''
+            });
         }
         let failure_callback = (json_error) => {
             addToast('error',json_error.detail)
@@ -41,6 +50,7 @@
 
         await create_chat(params, success_callback, failure_callback);
     }
+
     const onclick = async (id) => {
         chat_id = id
 

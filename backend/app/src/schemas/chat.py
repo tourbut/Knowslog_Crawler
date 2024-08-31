@@ -29,7 +29,9 @@ class CreateChat(SQLModel):
     user_llm_id: uuid.UUID
 
 class ResponseChat(SQLModel):
-    id: uuid.UUID 
+    id: uuid.UUID
+    title: str
+    user_llm_id: uuid.UUID
     
 class GetChat(SQLModel):
     category: str = "chat"
