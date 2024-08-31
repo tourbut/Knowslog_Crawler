@@ -30,7 +30,7 @@ REDIS_URL = settings.REDIS_URL
 
 # Function to get or create a RedisChatMessageHistory instance
 def get_redis_history(session_id: str) -> BaseChatMessageHistory:
-    return RedisChatMessageHistory(session_id, redis_url=REDIS_URL)
+    return RedisChatMessageHistory(session_id, redis_url=REDIS_URL, ttl=60 * 60 * 24 * 7)
 
 @router.post("/send_message",response_model=chat_schema.OutMessage)
 async def send_message(*, session: SessionDep_async, current_user: CurrentUser,chat_in: chat_schema.SendMessage):
@@ -136,20 +136,24 @@ async def get_chat_list(*, session: SessionDep_async, current_user: CurrentUser)
 async def get_messages(*, session: SessionDep_async, current_user: CurrentUser, chat_id:uuid.UUID):
     
     # Redis에서 메시지를 가져오는 코드
-    history = get_redis_history(chat_id.hex)
-    messages = []
-    for message in history.messages:
-        msg = chat_schema.ReponseMessages(
-            chat_id=chat_id,
-            name=message.additional_kwargs["name"],
-            content=message.content,
-            is_user=message.type == "human",
-            create_date=datetime.strptime(message.additional_kwargs["create_date"],"%Y-%m-%d %H:%M:%S")
-        )
-        messages.append(msg)
-    
-    # DB에서 메시지를 가져오는 코드    
-    #messages = await chat_crud.get_messages(session=session,current_user=current_user,chat_id=chat_id)
+    try:
+        history = get_redis_history(chat_id.hex)
+        messages = []
+        for message in history.messages:
+            msg = chat_schema.ReponseMessages(
+                chat_id=chat_id,
+                name=message.additional_kwargs["name"],
+                content=message.content,
+                is_user=message.type == "human",
+                create_date=datetime.strptime(message.additional_kwargs["create_date"],"%Y-%m-%d %H:%M:%S")
+            )
+            messages.append(msg)
+        
+        # DB에서 메시지를 가져오는 코드    
+        
+    except Exception as e:
+        print(e)
+        messages = await chat_crud.get_messages(session=session,current_user=current_user,chat_id=chat_id)
     
     return messages
 

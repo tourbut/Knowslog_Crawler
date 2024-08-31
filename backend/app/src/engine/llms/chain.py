@@ -137,7 +137,7 @@ def thinking_chatbot_chain(api_key:str,
     
     chain = (
                 {
-                    "thought":runnable|think_prompt|llm,
+                    "thought":runnable|think_prompt|llm|strparser,
                     "input":RunnablePassthrough()
                 }|prompt|llm
             )

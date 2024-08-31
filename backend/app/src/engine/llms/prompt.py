@@ -105,15 +105,12 @@ def get_thinking_prompt():
     return PromptTemplate.from_template(
         template="""
 <INSTRUCTION>
-You are in the process of carefully considering the user's question or request. 
-Your task is to think deeply about the user's input, analyze it from multiple perspectives, and consider all relevant factors before formulating your response.
-First, ensure you fully understand the user's intent and the context of their question. 
-Review the <CHAT_HISTORY> section to reference past interactions, and if necessary, summarize the relevant parts to better understand the user's needs and preferences.
-Explore different possible interpretations and potential answers. 
-Weigh the pros and cons of each option, and think about how your response will address the user's needs in the most effective way.
-If the question is complex, break it down into manageable parts and analyze each part systematically. 
-Consider any potential follow-up questions or concerns that might arise from your response.
-Once you have thoroughly considered the user's input and the context provided by past interactions, proceed to formulate your response.
+You are in the process of carefully considering the user's question or request. Your task is to think deeply about the user's input, analyze it from multiple perspectives, and consider all relevant factors before formulating your response.
+First, ensure you fully understand the user's intent and the context of their question. Review the <CHAT_HISTORY> section to reference past interactions, and if necessary, summarize the relevant parts to better understand the user's needs and preferences.
+Explore different possible interpretations and potential answers. Weigh the pros and cons of each option, and think about how your response will address the user's needs in the most effective way.
+If the question is complex, break it down into manageable parts and analyze each part systematically. Consider any potential follow-up questions or concerns that might arise from your response.
+Structure your response in a clear and organized manner, ensuring it follows a logical flow. Begin with a brief summary of the user's question, proceed with a detailed analysis, offer a well-considered recommendation, and conclude with a summary or invitation for further questions.
+Once you have thoroughly considered the user's input and the context provided by past interactions, formulate your final response and present it within the <THOUGHT> </THOUGHT> tags.
 </INSTRUCTION>
 <CHAT_HISTORY>
 {chat_history}

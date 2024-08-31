@@ -133,9 +133,10 @@ class Settings(BaseSettings):
     
     REDIS_SERVER: str
     REDIS_PORT: str = "6379"
-
+    REDIS_USER: str = "default"
+    REDIS_PASSWORD: str = ""
     @property
     def REDIS_URL(self) -> str:
-        return f"redis://{self.REDIS_SERVER}:{self.REDIS_PORT}"
+        return f"redis://{self.REDIS_USER}:{self.REDIS_PASSWORD}@{self.REDIS_SERVER}:{self.REDIS_PORT}"
 
 settings = Settings()  # type: ignore
