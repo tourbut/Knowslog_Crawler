@@ -138,5 +138,7 @@ class Settings(BaseSettings):
     @property
     def REDIS_URL(self) -> str:
         return f"redis://{self.REDIS_USER}:{self.REDIS_PASSWORD}@{self.REDIS_SERVER}:{self.REDIS_PORT}"
+    
+    FILE_UPLOAD_DIR: str = "./files"
 
 settings = Settings()  # type: ignore

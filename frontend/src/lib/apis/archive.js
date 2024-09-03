@@ -1,4 +1,5 @@
 import fastapi from "$lib/fastapi";
+import fastapi_file from "$lib/fastapi_file";
 
 export async function request_archiving(params, success_callback, failure_callback) {
     let url = "/archive/run_archiving/"
@@ -18,4 +19,9 @@ export async function get_archive(get_id,params,success_callback, failure_callba
 export async function delete_archive(params,success_callback, failure_callback) {
     let url = `/archive/delete_archive/`
     await fastapi('put', url, params,success_callback,failure_callback)
+}
+
+export async function upload_flies(params,success_callback, failure_callback) {
+    let url = `/archive/upload_flies/`
+    await fastapi_file(url, params,success_callback,failure_callback)
 }

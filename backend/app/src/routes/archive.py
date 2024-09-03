@@ -13,6 +13,12 @@ from app.src.engine.llms.chain import translate_chain,summarize_chain
 from datetime import datetime
 from requests.exceptions import RequestException
 
+from tempfile import NamedTemporaryFile
+from typing import IO
+
+from fastapi import FastAPI, File, UploadFile
+import os
+
 router = APIRouter()
 
 async def translate_archive(in_archive:archive_schema.Archive,
@@ -172,3 +178,19 @@ async def delete_archive(*, session: SessionDep_async, current_user: CurrentUser
     rst = await archive_crud.update_archive(session=session,archive=in_archive)
     
     return rst
+
+async def save_file(file: IO,user_id:uuid.UUID) -> str:
+    
+    user_file_path = f"{settings.FILE_UPLOAD_DIR}/{str(user_id)}"
+    
+    if not os.path.exists(user_file_path):
+        os.makedirs(user_file_path)
+        
+    with NamedTemporaryFile("wb", delete=False,dir=user_file_path) as tempfile:
+        tempfile.write(file.read())
+        return tempfile.name
+    
+@router.post("/upload_flies/")
+async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,file: UploadFile):
+    path = await save_file(file.file,user_id=current_user.id)
+    return {"filepath": path}
