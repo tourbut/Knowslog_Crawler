@@ -83,7 +83,7 @@ async def create_archive_refine_usage(*,session: AsyncSession,
                                       usage_1: archive_schema.Usage,
                                       refine_2: archive_schema.Refine, 
                                       usage_2: archive_schema.Usage,
-                                      user_id:int) -> Archive:
+                                      user_id:uuid.UUID) -> Archive:
     try:
         db_archive = None
         db_refine_1 = None
@@ -144,4 +144,10 @@ async def update_archive(*,session: AsyncSession, archive: archive_schema.Archiv
         await session.refresh(db_archive)
     return db_archive
     
+async def create_file(*,session: AsyncSession, file: archive_schema.FileUpload,user_id:uuid.UUID) -> UserFiles:
+    db_obj = UserFiles.model_validate(file,update={"user_id":user_id})
+    session.add(db_obj)
+    await session.commit()
+    await session.refresh(db_obj)
+    return db_obj
 

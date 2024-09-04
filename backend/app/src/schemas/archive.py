@@ -64,3 +64,11 @@ class Update_Archive(SQLModel):
     url : str|None = None
     dom : str|None = None
     delete_yn: bool|None = None
+    
+class FileUpload(SQLModel):
+    file_name:str
+    file_path:str
+    file_size:int
+    file_type:str
+    file_ext:str
+    file_desc:str | None = None

@@ -52,6 +52,16 @@ class UserUsage(CommonBase, table=True):
     input_token:int = Field(nullable=False)
     output_token:int = Field(nullable=False)
 
+class UserFiles(CommonBase, table=True):
+    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
+    user_id: uuid.UUID = Field(foreign_key="user.id")
+    file_name:str = Field(nullable=False,description="파일명")
+    file_path:str = Field(nullable=False,description="파일경로")
+    file_size:int = Field(nullable=False,description="파일크기")
+    file_type:str = Field(nullable=False,description="파일타입")
+    file_ext:str = Field(nullable=False,description="파일확장자")
+    file_desc:str | None = Field(nullable=True,description="파일설명")
+
 class Archive(CommonBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
     user_id: uuid.UUID = Field(foreign_key="user.id")
@@ -110,6 +120,7 @@ class Messages(CommonBase,table=True):
     name:str = Field(nullable=False, description="이름")
     content: str = Field(nullable=False, description="내용")
     is_user: bool = Field(nullable=False, description="유저여부")
+
 
 """
 class CrewAgent(CommonBase,table=True):

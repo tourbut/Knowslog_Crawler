@@ -192,5 +192,16 @@ async def save_file(file: IO,user_id:uuid.UUID) -> str:
     
 @router.post("/upload_flies/")
 async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,file: UploadFile):
-    path = await save_file(file.file,user_id=current_user.id)
+    try:
+        path = await save_file(file.file,user_id=current_user.id)
+        file_meta = archive_schema.FileUpload(file_name=file.filename,
+                                              file_path=path,
+                                              file_size=os.path.getsize(path),
+                                              file_type=file.content_type,
+                                              file_ext=file.filename.split(".")[-1])
+        await archive_crud.create_file(session=session,file=file_meta,user_id=current_user.id)
+        
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=404, detail=f"파일 업로드에 실패하였습니다.")
     return {"filepath": path}
