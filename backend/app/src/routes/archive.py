@@ -10,6 +10,7 @@ from app.src.schemas import archive as archive_schema
 from app.core.config import settings
 from app.src.engine.crawler import get_medium,get_webpage
 from app.src.engine.llms.chain import translate_chain,summarize_chain
+from app.src.engine.llms.file_embedding import load_and_split,embedding_and_store
 from datetime import datetime
 from requests.exceptions import RequestException
 
@@ -189,7 +190,7 @@ async def save_file(file: IO,user_id:uuid.UUID) -> str:
     with NamedTemporaryFile("wb", delete=False,dir=user_file_path) as tempfile:
         tempfile.write(file.read())
         return tempfile.name
-    
+
 @router.post("/upload_flies/")
 async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,file: UploadFile):
     try:
@@ -200,7 +201,8 @@ async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,f
                                               file_type=file.content_type,
                                               file_ext=file.filename.split(".")[-1])
         await archive_crud.create_file(session=session,file=file_meta,user_id=current_user.id)
-        
+        docs = await load_and_split(path)
+        print(docs)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=404, detail=f"파일 업로드에 실패하였습니다.")
