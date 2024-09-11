@@ -201,7 +201,7 @@ async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,f
                                               file_type=file.content_type,
                                               file_ext=file.filename.split(".")[-1])
         await archive_crud.create_file(session=session,file=file_meta,user_id=current_user.id)
-        docs = await load_and_split(path)
+        docs = await load_and_split(file_ext=file.filename.split(".")[-1],file_path=path)
         print(docs)
     except Exception as e:
         print(e)

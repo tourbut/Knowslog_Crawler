@@ -1,4 +1,3 @@
-from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain.embeddings import CacheBackedEmbeddings
 from langchain_openai import OpenAIEmbeddings
@@ -6,15 +5,18 @@ from langchain_postgres.vectorstores import PGVector
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import AsyncEngine
 from langchain.storage import LocalFileStore
+from langchain_community.document_loaders import TextLoader
 
-async def load_and_split(file_path: str):
+async def load_and_split(file_ext:str,file_path: str):
     character_text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
     separator="\n",
     chunk_size=600,
     chunk_overlap=100,
     )
+    
+    if file_ext == 'txt':
+        loader = TextLoader(file_path)
         
-    loader = UnstructuredFileLoader(file_path)
     docs = loader.load_and_split(text_splitter=character_text_splitter)
     return docs
 
