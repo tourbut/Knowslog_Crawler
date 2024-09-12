@@ -5,7 +5,8 @@ from langchain_postgres.vectorstores import PGVector
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import AsyncEngine
 from langchain.storage import LocalFileStore
-from langchain_community.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader, PDFMinerLoader, UnstructuredExcelLoader
+from langchain_community.document_loaders.csv_loader import CSVLoader
 
 async def load_and_split(file_ext:str,file_path: str):
     character_text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
@@ -16,6 +17,14 @@ async def load_and_split(file_ext:str,file_path: str):
     
     if file_ext == 'txt':
         loader = TextLoader(file_path)
+    elif file_ext == 'pdf':
+        loader = PDFMinerLoader(file_path)
+    elif file_ext == 'csv':
+        loader = CSVLoader(file_path)
+    elif file_ext in ['xls','xlsx']:
+        loader = UnstructuredExcelLoader(file_path)
+    else:
+        raise ValueError("File extension not supported")
         
     docs = loader.load_and_split(text_splitter=character_text_splitter)
     return docs

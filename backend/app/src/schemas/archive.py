@@ -1,5 +1,6 @@
 from sqlmodel import SQLModel
 import uuid
+from typing import List
 
 class ArchiveURL(SQLModel):
     url: str
@@ -28,19 +29,19 @@ class Usage(SQLModel):
     
 class ResponseArchive(SQLModel):
     id: uuid.UUID 
-    category: str
-    language: str
-    title: str 
-    author: str 
-    content: str
+    category: str =''
+    language: str =''
+    title: str =''
+    author: str =''
+    content: str =''
     translate_content: str| None = None
     translate_input_token: int| None = None
     translate_output_token: int | None = None
     summarize_content: str| None = None
     summarize_input_token: int| None = None
     summarize_output_token: int | None = None
-    url : str 
-    dom : str
+    url : str =''
+    dom : str =''
 
 class ArchiveList(SQLModel):
     id: uuid.UUID 
@@ -72,3 +73,11 @@ class FileUpload(SQLModel):
     file_type:str
     file_ext:str
     file_desc:str | None = None
+    
+class ResponseFile(SQLModel):
+    id: uuid.UUID
+    file_name:str
+    file_size:int
+    file_ext:str
+    file_desc:str | None = None
+    contents:List[str]

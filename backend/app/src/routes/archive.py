@@ -191,7 +191,7 @@ async def save_file(file: IO,user_id:uuid.UUID) -> str:
         tempfile.write(file.read())
         return tempfile.name
 
-@router.post("/upload_flies/")
+@router.post("/upload_flies/",response_model=archive_schema.ResponseFile)
 async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,file: UploadFile):
     try:
         path = await save_file(file.file,user_id=current_user.id)
@@ -200,10 +200,20 @@ async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,f
                                               file_size=os.path.getsize(path),
                                               file_type=file.content_type,
                                               file_ext=file.filename.split(".")[-1])
-        await archive_crud.create_file(session=session,file=file_meta,user_id=current_user.id)
+        db_obj = await archive_crud.create_file(session=session,file=file_meta,user_id=current_user.id)
         docs = await load_and_split(file_ext=file.filename.split(".")[-1],file_path=path)
-        print(docs)
+        
+        contents = [doc.page_content for doc in docs]
+        
+        response = archive_schema.ResponseFile(id=db_obj.id,
+                                               file_name=file_meta.file_name,
+                                               file_size=file_meta.file_size,
+                                               file_ext=file_meta.file_ext,
+                                               file_desc=file_meta.file_desc,
+                                               contents=contents)
+        
     except Exception as e:
         print(e)
         raise HTTPException(status_code=404, detail=f"파일 업로드에 실패하였습니다.")
-    return {"filepath": path}
+    
+    return response
