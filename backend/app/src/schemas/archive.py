@@ -49,6 +49,7 @@ class ArchiveList(SQLModel):
     title: str
     url:str
     
+
 class GetUserLLM(SQLModel):
     id: uuid.UUID 
     source: str
@@ -65,7 +66,10 @@ class Update_Archive(SQLModel):
     url : str|None = None
     dom : str|None = None
     delete_yn: bool|None = None
-    
+
+class DeleteFile(SQLModel):
+    id: uuid.UUID
+
 class FileUpload(SQLModel):
     file_name:str
     file_path:str
@@ -80,4 +84,9 @@ class ResponseFile(SQLModel):
     file_size:int
     file_ext:str
     file_desc:str | None = None
-    contents:List[str]
+    contents:List[str] = []
+    
+class ResponseArchiveList(SQLModel):
+    archive_list: List[ArchiveList]
+    file_list: List[ResponseFile]
+    

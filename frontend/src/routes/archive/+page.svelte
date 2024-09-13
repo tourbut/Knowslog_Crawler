@@ -10,14 +10,16 @@
     import Sidebar from "$lib/components/common/Sidebar.svelte";
     import FileUploader from "$lib/components/archive/FileUploader.svelte";
     import { onMount } from 'svelte';
-    import { get_archive_list, get_archive, delete_archive, upload_flies} from "$lib/apis/archive";
+    import { get_archive_list, get_archive, delete_archive, upload_flies, delete_file} from "$lib/apis/archive";
 
     let archive_list = []
+    let file_list = []
     let dataLoaded = false
     let _url = ''
     let _html =''
     let error = {detail:[]}
     let loading = false;
+    let view_type = 'web' //web, file
 
     let orgin_content = "Content will be displayed here"
     let orgin_data = ""
@@ -84,26 +86,47 @@
       let params = {}
 
       let success_callback = (json) => {
-        json.forEach(item => {
-                // 카테고리로 그룹화된 객체를 찾음
-                let categoryGroup = archive_list.find(group => group.category === item.category);
+        
+        json.archive_list.forEach(item => {
+              // 카테고리로 그룹화된 객체를 찾음
+              let categoryGroup = archive_list.find(group => group.category === item.category);
 
-                // 해당 카테고리가 없으면 새로 추가
-                if (!categoryGroup) {
-                    categoryGroup = { category: item.category, items: [] };
-                    archive_list.push(categoryGroup);
-                };
+              // 해당 카테고리가 없으면 새로 추가
+              if (!categoryGroup) {
+                  categoryGroup = { category: item.category, items: [] };
+                  archive_list.push(categoryGroup);
+              };
 
-                // 아이템 추가
-                categoryGroup.items.push({
-                  id: item.id,
-                  label: item.title || 'Untitled',  // title이 없을 경우 'Untitled'로 설정
-                  herf: '',            // id 기반 URL 설정
-                  caption: item.url
-                });
+              // 아이템 추가
+              categoryGroup.items.push({
+                id: item.id,
+                label: item.title || 'Untitled',  // title이 없을 경우 'Untitled'로 설정
+                herf: '',            // id 기반 URL 설정
+                caption: item.url
+              });
             });
 
-            dataLoaded = true
+
+        json.file_list.forEach(item => {
+              // 카테고리로 그룹화된 객체를 찾음
+              let categoryGroup = file_list.find(group => group.category === item.category);
+
+              // 해당 카테고리가 없으면 새로 추가
+              if (!categoryGroup) {
+                  categoryGroup = { category: item.category, items: [] };
+                  file_list.push(categoryGroup);
+              };
+
+              // 아이템 추가
+              categoryGroup.items.push({
+                id: item.id,
+                label: item.file_name || 'Untitled',  // title이 없을 경우 'Untitled'로 설정
+                herf: '',            // id 기반 URL 설정
+                caption: ''
+              });
+            });
+
+        dataLoaded = true
       }
 
       let failure_callback = (json_error) => {
@@ -157,7 +180,12 @@
 
       let success_callback = (json) => {
         addToast('info','삭제 완료')
+
         archive_list.forEach(item => {
+          item.items = item.items.filter(item => item.id != id)
+        });
+        
+        file_list.forEach(item => {
           item.items = item.items.filter(item => item.id != id)
         });
       }
@@ -167,8 +195,13 @@
         loading = false;
         addToast('error',error.detail)
       }
-
-      await delete_archive(params, success_callback, failure_callback);
+      
+      if (view_type == 'web') {
+        await delete_archive(params, success_callback, failure_callback);
+      }
+      else {
+        await delete_file(params, success_callback, failure_callback);
+      }
     }
 
     let is_html = false
@@ -219,13 +252,17 @@
 <div class="container">
   <div>
     {#if dataLoaded}
-        <Sidebar bind:side_menus={archive_list} btn_click={onclick} btn_item_more_click={btn_item_more_click}/>
+      {#if view_type == 'web'}
+          <Sidebar bind:side_menus={archive_list} btn_click={onclick} btn_item_more_click={btn_item_more_click}/>
+      {:else}
+          <Sidebar bind:side_menus={file_list} btn_click={onclick} btn_item_more_click={btn_item_more_click}/>
+      {/if}
     {/if}
   </div>
   <div class="content">
     <div class="mx-auto p-1 max-w-sm">
       <Tabs contentClass="">
-        <TabItem open={true}>
+        <TabItem open={true} on:click={()=>{view_type='web'}}>
           <span slot="title">웹</span>
           <Card>
             <div>
@@ -268,7 +305,7 @@
             </div>
           </Card>
         </TabItem>
-        <TabItem >
+        <TabItem  on:click={()=>{view_type='file'}}>
           <span slot="title">파일</span>
           <Card>
             <div>

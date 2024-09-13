@@ -37,6 +37,31 @@ async def get_archive_list(*,session: AsyncSession,user_id:uuid.UUID) -> Archive
     else:
         return archive.all()
 
+async def get_file_list(*,session: AsyncSession,user_id:uuid.UUID) -> UserFiles:
+    query = select(UserFiles.id,
+                   UserFiles.file_name,
+                   UserFiles.file_size,
+                   UserFiles.file_ext,
+                   UserFiles.file_desc,
+                   ).where(UserFiles.user_id == user_id,
+                           UserFiles.delete_yn == False)
+    files = await session.exec(query)
+    if files is None:
+        return None
+    else:
+        return files.all()
+
+async def delete_file(*,session: AsyncSession,user_id:uuid.UUID,file_id:uuid.UUID) -> UserFiles| None:
+    file = await session.get(UserFiles, file_id)
+    if not file:
+        return None
+    else:
+        file.delete_yn = True
+        session.add(file)
+        await session.commit()
+        await session.refresh(file)
+        return file
+
 async def get_userllm(*, session: AsyncSession,user_id:uuid.UUID) -> archive_schema.GetUserLLM| None:
     statement = select(UserLLM.id,
                        LLM.source,

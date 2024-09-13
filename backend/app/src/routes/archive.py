@@ -141,11 +141,12 @@ async def run_archiving(*, session: SessionDep_async, current_user: CurrentUser,
     return response
 
 
-@router.get("/get_archive_list", response_model=List[archive_schema.ArchiveList])
+@router.get("/get_archive_list", response_model=archive_schema.ResponseArchiveList)
 async def get_archive_list(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
     
-    rst = await archive_crud.get_archive_list(session=session,user_id=current_user.id)
-    
+    rst_1 = await archive_crud.get_archive_list(session=session,user_id=current_user.id)
+    rst_2 = await archive_crud.get_file_list(session=session,user_id=current_user.id)
+    rst  = archive_schema.ResponseArchiveList(archive_list=rst_1,file_list=rst_2)
     return rst
 
 @router.get("/get_archive/{archive_id}", response_model=archive_schema.ResponseArchive)
@@ -217,3 +218,19 @@ async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,f
         raise HTTPException(status_code=404, detail=f"파일 업로드에 실패하였습니다.")
     
     return response
+
+@router.put("/delete_file/")
+async def delete_file(*, session: SessionDep_async, current_user: CurrentUser,in_file:archive_schema.DeleteFile) -> Any:
+    try:    
+        file = await archive_crud.delete_file(session=session,
+                                                user_id=current_user.id,
+                                                file_id=in_file.id)
+        path = file.file_path
+        print(path)
+        if os.path.exists(path):
+            os.remove(path)
+        
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=404, detail=f"파일 삭제에 실패하였습니다.")
+    

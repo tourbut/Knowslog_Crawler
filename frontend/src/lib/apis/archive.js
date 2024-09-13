@@ -21,6 +21,11 @@ export async function delete_archive(params,success_callback, failure_callback) 
     await fastapi('put', url, params,success_callback,failure_callback)
 }
 
+export async function delete_file(params,success_callback, failure_callback) {
+    let url = `/archive/delete_file/`
+    await fastapi('put', url, params,success_callback,failure_callback)
+}
+
 export async function upload_flies(params,success_callback, failure_callback) {
     let url = `/archive/upload_flies/`
     await fastapi_file(url, params,success_callback,failure_callback)
