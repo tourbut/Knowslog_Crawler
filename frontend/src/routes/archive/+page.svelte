@@ -2,7 +2,7 @@
     import { Button, Spinner } from "flowbite-svelte";
     import { Hr} from 'flowbite-svelte';
     import { Card,Label, Input, InputAddon, ButtonGroup, Toggle, Textarea} from 'flowbite-svelte';
-    import { Tabs, TabItem } from 'flowbite-svelte';
+    import { Tabs, TabItem, P } from 'flowbite-svelte';
     import { request_archiving } from "$lib/apis/archive";
     import MarkdownViewer from "$lib/components/archive/MarkdownViewer.svelte";
     import { addToast } from '$lib/common';
@@ -10,7 +10,7 @@
     import Sidebar from "$lib/components/common/Sidebar.svelte";
     import FileUploader from "$lib/components/archive/FileUploader.svelte";
     import { onMount } from 'svelte';
-    import { get_archive_list, get_archive, delete_archive, upload_flies, delete_file} from "$lib/apis/archive";
+    import { get_archive_list, get_archive, delete_archive, upload_flies, delete_file, get_file} from "$lib/apis/archive";
 
     let archive_list = []
     let file_list = []
@@ -26,6 +26,7 @@
 
     let translate_content = "Content will be displayed here"
     let summarize_content = "Content will be displayed here"
+    let document_content = "Content will be displayed here"
 
     let auto_translate = true
     let auto_summarize = true
@@ -153,10 +154,18 @@
       }
 
       let success_callback = (json) => {
-        orgin_content = json.content
-        orgin_data= json.dom
-        translate_content = json.translate_content
-        summarize_content = json.summarize_content
+
+        
+        if (view_type == 'web') {
+          orgin_content = json.content
+          orgin_data= json.dom
+          translate_content = json.translate_content
+          summarize_content = json.summarize_content
+        }
+        else {
+          console.log(json.contents.join('\n'))
+          document_content = json.contents.join('\n')
+        }
       }
   
       let failure_callback = (json_error) => {
@@ -164,8 +173,12 @@
         loading = false;
         addToast('error',error.detail)
       }
-
-      await get_archive(id,params, success_callback, failure_callback);
+      if (view_type == 'web') {
+        await get_archive(id,params, success_callback, failure_callback);
+      }
+      else {
+        await get_file(id,params, success_callback, failure_callback);
+      }
     }
 
     const btn_item_more_click = async (id) =>
@@ -321,6 +334,7 @@
     <Hr hrClass="h-px my-1 bg-gray-200 border-0 dark:bg-gray-700"/>
     
     <div class="form-tabs">
+      {#if view_type == 'web'}
       <Tabs>
         <TabItem open={true} title="원본">
           <MarkdownViewer bind:markdown={orgin_content} bind:loading={loading} bind:orgin_data={orgin_data}/>
@@ -332,6 +346,10 @@
           <MarkdownViewer bind:markdown={summarize_content} bind:loading={loading} />
         </TabItem>
       </Tabs>
+      {:else}
+      <MarkdownViewer bind:markdown={document_content} bind:loading={loading} />
+     
+      {/if}
     </div>  
   </div> 
 </div>

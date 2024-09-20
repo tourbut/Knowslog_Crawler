@@ -176,3 +176,9 @@ async def create_file(*,session: AsyncSession, file: archive_schema.FileUpload,u
     await session.refresh(db_obj)
     return db_obj
 
+async def get_file(*,session: AsyncSession,file_id:uuid.UUID) -> UserFiles| None:
+    file = await session.get(UserFiles, file_id)
+    if not file:
+        return None
+    else:
+        return file

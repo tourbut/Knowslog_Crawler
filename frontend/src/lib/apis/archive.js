@@ -30,3 +30,8 @@ export async function upload_flies(params,success_callback, failure_callback) {
     let url = `/archive/upload_flies/`
     await fastapi_file(url, params,success_callback,failure_callback)
 }
+
+export async function get_file(get_id,params,success_callback, failure_callback) {
+    let url = `/archive/get_file/${get_id}`
+    await fastapi('get', url, params,success_callback,failure_callback)
+}

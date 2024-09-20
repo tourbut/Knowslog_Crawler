@@ -2,6 +2,7 @@ import uuid
 from typing import Any,List
 
 from fastapi import APIRouter, HTTPException
+from fastapi.responses import FileResponse
 
 from app.src.deps import SessionDep_async,CurrentUser
 from app.src.crud import archive as archive_crud
@@ -219,12 +220,34 @@ async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,f
     
     return response
 
+@router.get("/get_file/{file_id}", response_model=archive_schema.ResponseFile)
+async def get_file(*, session: SessionDep_async, current_user: CurrentUser,file_id:uuid.UUID) -> Any:
+    
+    try:
+        rst_file = await archive_crud.get_file(session=session,file_id=file_id)
+        docs = await load_and_split(file_ext=rst_file.file_ext,file_path=rst_file.file_path,
+                                    splitter_options={"separator":"\n","chunk_size":600,"chunk_overlap":0})
+        
+        contents = [doc.page_content for doc in docs]
+        
+        response = archive_schema.ResponseFile(id=rst_file.id,
+                                            file_name=rst_file.file_name,
+                                            file_size=rst_file.file_size,
+                                            file_ext=rst_file.file_ext,
+                                            file_desc=rst_file.file_desc,
+                                            contents=contents)
+        
+        return response
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=404, detail=f"파일 조회에 실패하였습니다.")
+
 @router.put("/delete_file/")
 async def delete_file(*, session: SessionDep_async, current_user: CurrentUser,in_file:archive_schema.DeleteFile) -> Any:
     try:    
         file = await archive_crud.delete_file(session=session,
-                                                user_id=current_user.id,
-                                                file_id=in_file.id)
+                                              user_id=current_user.id,
+                                              file_id=in_file.id)
         path = file.file_path
         print(path)
         if os.path.exists(path):
@@ -234,3 +257,12 @@ async def delete_file(*, session: SessionDep_async, current_user: CurrentUser,in
         print(e)
         raise HTTPException(status_code=404, detail=f"파일 삭제에 실패하였습니다.")
     
+@router.get("/download_file/{file_id}")
+async def download_file(*, session: SessionDep_async, current_user: CurrentUser,file_id:uuid.UUID) -> Any:  
+    try:
+        rst_file = await archive_crud.get_file(session=session,file_id=file_id)
+        
+        return FileResponse(path=rst_file.file_path, filename=rst_file.file_name,media_type=rst_file.file_type)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=404, detail=f"파일 다운로드에 실패하였습니다.")

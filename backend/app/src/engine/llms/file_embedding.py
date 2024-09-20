@@ -8,11 +8,12 @@ from langchain.storage import LocalFileStore
 from langchain_community.document_loaders import TextLoader, PDFMinerLoader, UnstructuredExcelLoader
 from langchain_community.document_loaders.csv_loader import CSVLoader
 
-async def load_and_split(file_ext:str,file_path: str):
+async def load_and_split(file_ext:str,file_path: str,
+                         splitter_options:dict={"separator":"\n","chunk_size":600,"chunk_overlap":100}):
     character_text_splitter = CharacterTextSplitter.from_tiktoken_encoder(
-    separator="\n",
-    chunk_size=600,
-    chunk_overlap=100,
+    separator=splitter_options["separator"],
+    chunk_size=splitter_options["chunk_size"],
+    chunk_overlap=splitter_options["chunk_size"],
     )
     
     if file_ext == 'txt':
