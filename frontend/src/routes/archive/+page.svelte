@@ -10,7 +10,7 @@
     import Sidebar from "$lib/components/common/Sidebar.svelte";
     import FileUploader from "$lib/components/archive/FileUploader.svelte";
     import { onMount } from 'svelte';
-    import { get_archive_list, get_archive, delete_archive, upload_flies, delete_file, get_file} from "$lib/apis/archive";
+    import { get_archive_list, get_archive, delete_archive, upload_flies, delete_file, get_file, download_file} from "$lib/apis/archive";
 
     let archive_list = []
     let file_list = []
@@ -31,6 +31,17 @@
     let auto_translate = true
     let auto_summarize = true
 
+    let is_html = false
+    let translate_tabon = true
+    let summarize_tabon = true
+
+    let files = null;
+    let file_value = null;
+    let archive_id = null;
+    let file = {
+        name: '',
+        ext:'md'
+      }
     const btn_start = async () => {
       if (_url == '' && _html == '') {
         addToast('warning','URL을 입력해주세요.')
@@ -107,7 +118,6 @@
               });
             });
 
-
         json.file_list.forEach(item => {
               // 카테고리로 그룹화된 객체를 찾음
               let categoryGroup = file_list.find(group => group.category === item.category);
@@ -143,27 +153,31 @@
         get_data()
     })
 
-    const onclick = async (id) => {
+    const onclick_sidebar = async (id) => {
       
       if (id =='') {
         return
       }
-
+      
       let params = {
         
       }
+
+      archive_id=id
 
       let success_callback = (json) => {
 
         
         if (view_type == 'web') {
+          file.name = json.title
           orgin_content = json.content
           orgin_data= json.dom
           translate_content = json.translate_content
           summarize_content = json.summarize_content
         }
         else {
-          console.log(json.contents.join('\n'))
+          file.name = json.file_name
+          file.ext = json.file_ext
           document_content = json.contents.join('\n')
         }
       }
@@ -181,7 +195,7 @@
       }
     }
 
-    const btn_item_more_click = async (id) =>
+    const onclick_more = async (id) =>
     {
       if (id =='') {
         return
@@ -217,16 +231,26 @@
       }
     }
 
-    let is_html = false
-    let translate_tabon = true
-    let summarize_tabon = true
+    const onclick_download = async() => {
 
-    $ : is_html ? _url = '' : _html = ''
-    $ : translate_content != "Content will be displayed here" ? translate_tabon = false : translate_tabon = true 
-    $ : summarize_content != "Content will be displayed here" ? summarize_tabon = false : summarize_tabon = true 
+      if (archive_id == null) {
+        addToast('warning','다운로드 할 데이터가 없습니다.')
+        return
+      }
 
-    let files = null;
-    let file_value = null;
+      let success_callback = (json) => {
+        addToast('info','다운로드 완료')
+      }
+
+      let failure_callback = (json_error) => {
+        error = json_error
+        loading = false;
+        addToast('error',error.detail)
+      }
+
+      await download_file(archive_id,file, success_callback, failure_callback);
+
+    }
 
     const file_upload = async () => {
 
@@ -237,7 +261,7 @@
 
       let file_ext = files[0].name.split('.').pop().toLowerCase();
 
-      if (!['txt','TXT','pdf','PDF','xlsx','XLSX','csv','CSV'].includes(file_ext)) {
+      if (!['txt','TXT','pdf','PDF','xlsx','XLSX','csv','CSV','md'].includes(file_ext)) {
         addToast('warning','지원하지 않는 파일 형식입니다.')
         return
       }
@@ -260,15 +284,19 @@
       }
       await upload_flies(files[0], success_callback, failure_callback);
     }
+
+    $ : is_html ? _url = '' : _html = ''
+    $ : translate_content != "Content will be displayed here" ? translate_tabon = false : translate_tabon = true 
+    $ : summarize_content != "Content will be displayed here" ? summarize_tabon = false : summarize_tabon = true 
 </script>
 
 <div class="container">
   <div>
     {#if dataLoaded}
       {#if view_type == 'web'}
-          <Sidebar bind:side_menus={archive_list} btn_click={onclick} btn_item_more_click={btn_item_more_click}/>
+          <Sidebar bind:side_menus={archive_list} btn_click={onclick_sidebar} btn_item_more_click={onclick_more}/>
       {:else}
-          <Sidebar bind:side_menus={file_list} btn_click={onclick} btn_item_more_click={btn_item_more_click}/>
+          <Sidebar bind:side_menus={file_list} btn_click={onclick_sidebar} btn_item_more_click={onclick_more}/>
       {/if}
     {/if}
   </div>
@@ -337,17 +365,17 @@
       {#if view_type == 'web'}
       <Tabs>
         <TabItem open={true} title="원본">
-          <MarkdownViewer bind:markdown={orgin_content} bind:loading={loading} bind:orgin_data={orgin_data}/>
+          <MarkdownViewer bind:markdown={orgin_content} bind:loading={loading} bind:orgin_data={orgin_data} onclick_download={onclick_download}/>
         </TabItem>
         <TabItem title="번역" disabled={translate_tabon}>
-          <MarkdownViewer bind:markdown={translate_content} bind:loading={loading} />
+          <MarkdownViewer bind:markdown={translate_content} bind:loading={loading} onclick_download={onclick_download}/>
         </TabItem>
         <TabItem title="요약" disabled={summarize_tabon} >
-          <MarkdownViewer bind:markdown={summarize_content} bind:loading={loading} />
+          <MarkdownViewer bind:markdown={summarize_content} bind:loading={loading} onclick_download={onclick_download}/>
         </TabItem>
       </Tabs>
       {:else}
-      <MarkdownViewer bind:markdown={document_content} bind:loading={loading} />
+      <MarkdownViewer bind:markdown={document_content} bind:loading={loading} onclick_download={onclick_download}/>
      
       {/if}
     </div>  

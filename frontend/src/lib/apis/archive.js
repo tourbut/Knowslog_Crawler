@@ -26,12 +26,17 @@ export async function delete_file(params,success_callback, failure_callback) {
     await fastapi('put', url, params,success_callback,failure_callback)
 }
 
-export async function upload_flies(params,success_callback, failure_callback) {
+export async function upload_flies(file,success_callback, failure_callback) {
     let url = `/archive/upload_flies/`
-    await fastapi_file(url, params,success_callback,failure_callback)
+    await fastapi_file('upload',url, file,success_callback,failure_callback)
 }
 
 export async function get_file(get_id,params,success_callback, failure_callback) {
     let url = `/archive/get_file/${get_id}`
     await fastapi('get', url, params,success_callback,failure_callback)
+}
+
+export async function download_file(get_id,file,success_callback, failure_callback) {
+    let url = `/archive/download_file/${get_id}`
+    await fastapi_file('download', url, file,success_callback,failure_callback)
 }

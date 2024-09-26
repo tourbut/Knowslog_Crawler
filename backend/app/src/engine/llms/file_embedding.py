@@ -16,11 +16,11 @@ async def load_and_split(file_ext:str,file_path: str,
     chunk_overlap=splitter_options["chunk_size"],
     )
     
-    if file_ext == 'txt':
+    if file_ext in ['txt','md']:
         loader = TextLoader(file_path)
-    elif file_ext == 'pdf':
+    elif file_ext in ['pdf']:
         loader = PDFMinerLoader(file_path)
-    elif file_ext == 'csv':
+    elif file_ext in ['csv']:
         loader = CSVLoader(file_path)
     elif file_ext in ['xls','xlsx']:
         loader = UnstructuredExcelLoader(file_path)

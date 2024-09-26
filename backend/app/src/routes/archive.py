@@ -1,8 +1,9 @@
 import uuid
+import io
 from typing import Any,List
 
 from fastapi import APIRouter, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse,StreamingResponse
 
 from app.src.deps import SessionDep_async,CurrentUser
 from app.src.crud import archive as archive_crud
@@ -262,7 +263,16 @@ async def download_file(*, session: SessionDep_async, current_user: CurrentUser,
     try:
         rst_file = await archive_crud.get_file(session=session,file_id=file_id)
         
-        return FileResponse(path=rst_file.file_path, filename=rst_file.file_name,media_type=rst_file.file_type)
+        if rst_file is None:
+            
+            rst_archive = await archive_crud.get_archive(session=session,user_id=current_user.id,archive_id=file_id)
+
+            return StreamingResponse(io.BytesIO(rst_archive.content.encode("utf-8")),
+                                     media_type="application/octet-stream",)
+        
+        return FileResponse(path=rst_file.file_path, filename=rst_file.file_name,
+                            media_type=rst_file.file_type,
+                           )
     except Exception as e:
         print(e)
         raise HTTPException(status_code=404, detail=f"파일 다운로드에 실패하였습니다.")
