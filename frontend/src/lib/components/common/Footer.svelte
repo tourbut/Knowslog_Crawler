@@ -3,6 +3,6 @@
 </script>
 
 <Footer footerType="logo">
-    <hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
+    <hr class="my-1 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-1" />
     <FooterCopyright href="/" by="Knowslog" />
 </Footer>

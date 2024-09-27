@@ -36,7 +36,7 @@
     <h1>{$username}님 반갑습니다.</h1>
   </div>
 {:else}
-<Card class="container mx-auto p-4 max-w-md">
+<Card class="container mx-auto p-4 max-w-md my-8">
   <form class="flex flex-col space-y-6" method="post" on:submit|preventDefault={() => {handleSubmit();}}>
     <h3 class="text-xl font-medium text-gray-900 dark:text-white">Sign in to Knowslog</h3>
     <Label class="space-y-2">
