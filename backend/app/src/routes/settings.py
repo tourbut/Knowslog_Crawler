@@ -1,3 +1,5 @@
+import uuid
+
 from typing import Any, Annotated, List
 from datetime import timedelta
 
@@ -63,3 +65,12 @@ async def update_userllm(*, session: SessionDep_async, userllm_update: settings_
     Update User LLM
     """
     userllm = await settings_crud.update_userllm(session=session, userllm_update=userllm_update)
+    
+@router.get("/get_userusage",response_model=List[settings_schema.Get_UserUsage])
+async def get_userusage(*, session: SessionDep_async, current_user: CurrentUser) -> Any:
+    """
+    Get User Usage
+    """
+    userusage = await settings_crud.get_userusage(session=session,user_id=current_user.id)
+        
+    return userusage

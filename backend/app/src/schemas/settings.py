@@ -1,5 +1,7 @@
+from numpy import source
 from app.models import *
 from sqlmodel import SQLModel
+from datetime import datetime
 import uuid
 
 class Get_LLM(SQLModel):
@@ -42,3 +44,11 @@ class Update_UserLLM(SQLModel):
 
 class Delete_UserLLM(SQLModel):
     id:uuid.UUID 
+    
+class Get_UserUsage(SQLModel):
+    source:str
+    name:str
+    usage_date:datetime
+    input_token:int
+    output_token:int
+    cost:float

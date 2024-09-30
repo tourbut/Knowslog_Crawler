@@ -1,7 +1,7 @@
 from typing import List
 from app.models import *
 from app.src.schemas import settings as settings_schema
-from sqlmodel import Session, select
+from sqlmodel import Session, select, func
 
 async def get_llm(*, session: Session) -> List[LLM]| None:
     statement = select(LLM)
@@ -78,3 +78,23 @@ async def update_userllm(*, session: Session, userllm_update: settings_schema.Up
         await session.refresh(userllm)
 
     return userllm
+
+async def get_userusage(*, session: Session,user_id:uuid.UUID):
+    statement = select(LLM.source,
+                       LLM.name,
+                       func.date(UserUsage.usage_date).label("usage_date"),
+                       func.sum(UserUsage.input_token).label("input_token"),
+                       func.sum(UserUsage.output_token).label("output_token"),
+                       func.sum(UserUsage.input_token * LLM.input_price + UserUsage.output_token * LLM.output_price).label("cost")
+                       ).where(UserLLM.user_id == user_id,
+                                UserLLM.llm_id == LLM.id,
+                                UserLLM.api_id ==UserAPIKey.id,
+                                UserUsage.user_llm_id == UserLLM.id).group_by(LLM.source,
+                                                                                LLM.name,
+                                                                                func.date(UserUsage.usage_date))
+    
+    userusage = await session.exec(statement)
+    if not userusage:
+        return None
+    else:
+        return userusage.all()
