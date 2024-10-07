@@ -18,6 +18,7 @@
     export let formModal = false;
     export let btn_id=0;
     export let is_combo_modal=false;
+    export let is_plus=true;
     let is_new=false;
 
 
@@ -44,19 +45,21 @@
 </script>
 
 <div>
+    {#if (is_plus)}
     <div>
     <Toolbar style="background-color: transparent;">
         <ToolbarButton on:click={() => (formModal = true, is_new=true)}><PlusOutline class="w-4 h-4" /></ToolbarButton>
     </Toolbar>
     </div>
+    {/if}
     <div>
     <Table hoverable={true}>
         <TableHead>
             {#each table_head as item}
-                <TableHeadCell padding="px-3 py-3">{item.desc}</TableHeadCell>
+                <TableHeadCell class="text-center" padding="px-3 py-3">{item.desc}</TableHeadCell>
             {/each}
             {#if is_editable}
-                <TableHeadCell padding="px-3 py-3"></TableHeadCell>
+                <TableHeadCell class="text-center" padding="px-3 py-3"></TableHeadCell>
             {/if}
         </TableHead>
         <TableBody tableBodyClass="divide-y">
@@ -67,6 +70,12 @@
                     <TableBodyCell>
                         <Checkbox disabled bind:checked={item[head.name]} />
                     </TableBodyCell>
+                    {:else if (head.type === 'integer')}
+                    <TableBodyCell class="text-right">{item[head.name].toLocaleString()}</TableBodyCell>
+                    {:else if (head.type === 'float')}
+                    <TableBodyCell class="text-right">{item[head.name].toFixed(6)}</TableBodyCell>
+                    {:else if (head.type === 'date')}
+                    <TableBodyCell class="text-center">{new Date(item[head.name]).toLocaleDateString()}</TableBodyCell>
                     {:else}
                     <TableBodyCell>{item[head.name]}</TableBodyCell>
                     {/if}

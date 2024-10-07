@@ -85,13 +85,13 @@ async def get_userusage(*, session: Session,user_id:uuid.UUID):
                        func.date(UserUsage.usage_date).label("usage_date"),
                        func.sum(UserUsage.input_token).label("input_token"),
                        func.sum(UserUsage.output_token).label("output_token"),
-                       func.sum(UserUsage.input_token * LLM.input_price + UserUsage.output_token * LLM.output_price).label("cost")
+                       func.sum((UserUsage.input_token / 1000000) * LLM.input_price + (UserUsage.output_token / 1000000) * LLM.output_price).label("cost") # 1M 토큰당 비용(1M = 1,000,000)
                        ).where(UserLLM.user_id == user_id,
                                 UserLLM.llm_id == LLM.id,
                                 UserLLM.api_id ==UserAPIKey.id,
                                 UserUsage.user_llm_id == UserLLM.id).group_by(LLM.source,
                                                                                 LLM.name,
-                                                                                func.date(UserUsage.usage_date))
+                                                                                func.date(UserUsage.usage_date)).order_by(func.date(UserUsage.usage_date).desc())
     
     userusage = await session.exec(statement)
     if not userusage:

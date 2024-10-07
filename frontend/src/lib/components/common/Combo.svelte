@@ -4,7 +4,6 @@
 
     let selected_item="선택하세요.";
 
-
     export let ComboMenu = [
       { drop_value:'us',value: 'CA', name: 'Californiass' },
       { drop_value:'us',value: 'TX', name: 'Texas' },

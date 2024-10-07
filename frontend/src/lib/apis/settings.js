@@ -34,3 +34,8 @@ export async function update_userllm(params, success_callback, failure_callback)
     let url = "/settings/update_userllm/"
     await fastapi('put', url, params,success_callback,failure_callback)
 }
+
+export async function get_userusage(params, success_callback, failure_callback) {
+    let url = "/settings/get_userusage/"
+    await fastapi('get', url, params,success_callback,failure_callback)
+}

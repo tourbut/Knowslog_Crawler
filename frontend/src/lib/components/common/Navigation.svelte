@@ -27,7 +27,7 @@
         </NavLi>    
         <Dropdown class="w-44 z-20">
             <DropdownItem href="/detail">개인정보</DropdownItem>
-            <DropdownItem href="/settings">LLM설정</DropdownItem>
+            <DropdownItem href="/llms">LLM설정</DropdownItem>
             <DropdownItem href="/usage">사용량조회</DropdownItem>
             <DropdownDivider />
             {#if $is_admin}
