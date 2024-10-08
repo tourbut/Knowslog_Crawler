@@ -1,4 +1,3 @@
-
 from langchain_community.document_loaders import UnstructuredFileLoader
 from langchain.text_splitter import CharacterTextSplitter, TokenTextSplitter
 from langchain.embeddings import CacheBackedEmbeddings
@@ -7,6 +6,11 @@ from langchain_postgres.vectorstores import PGVector
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import AsyncEngine
 from sqlmodel import Session,create_engine
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def load_and_split(file_path: str):
@@ -56,8 +60,8 @@ def embedding_and_store(docs, connection, collection_name:str, api_key:str, mode
 if __name__ == '__main__':
     
     collection_name = 'test_pdf'
-    api_key=''
-    url = ''
+    api_key = os.getenv('OPENAI_API_KEY')
+    url = 'postgresql://knowslog:knowslog1!@localhost:5433/knowsdb'
     
     engine = create_engine(url)
     
