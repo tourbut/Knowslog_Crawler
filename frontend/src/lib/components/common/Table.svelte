@@ -67,7 +67,7 @@
                 <TableBodyRow>
                     {#each table_head as head}
                     {#if (head.type === 'boolean')}
-                    <TableBodyCell>
+                    <TableBodyCell class="text-center">
                         <Checkbox disabled bind:checked={item[head.name]} />
                     </TableBodyCell>
                     {:else if (head.type === 'integer')}
@@ -77,7 +77,7 @@
                     {:else if (head.type === 'date')}
                     <TableBodyCell class="text-center">{new Date(item[head.name]).toLocaleDateString()}</TableBodyCell>
                     {:else}
-                    <TableBodyCell>{item[head.name]}</TableBodyCell>
+                    <TableBodyCell class="text-center">{item[head.name]}</TableBodyCell>
                     {/if}
                     {/each}
                     {#if is_editable}

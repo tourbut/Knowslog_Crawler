@@ -7,7 +7,7 @@
     import Combo from '$lib/components/common/Combo.svelte';
 
     let usage_table_head=[
-      {id:0,name:"usage_date",type:"date",desc:"이용일자"},
+      {id:0,name:"usage_date",type:"string",desc:"이용일자"},
       {id:1,name:"source",type:"string",desc:"출처"},
       {id:2,name:"name",type:"string",desc:"모델명"},
       {id:3,name:"input_token",type:"integer",desc:"Input Token"},
@@ -19,16 +19,61 @@
       { value: 'day', name: '일별 사용량' },
       { value: 'month', name: '월별 사용량' },
     ]
+    
     let query_type = 'day'
 
+    let usage_day=[];
+    let usage_month=[];
     let usage_table_body=[];
     
     async function get_data()
     {
       let params = {}
 
-      let success_callback = (json) => {
-        usage_table_body=json
+      let success_callback = (json) => {        
+        usage_day = json.map((item) => {
+          return {
+            usage_date: item.usage_date.substring(0,10),
+            source: item.source,
+            name: item.name,
+            input_token: item.input_token,
+            output_token: item.output_token,
+            cost: item.cost
+          }
+        })
+
+        usage_month = json.map((item) => {
+          return {
+            usage_date: item.usage_date.substring(0,7),
+            source: item.source,
+            name: item.name,
+            input_token: item.input_token,
+            output_token: item.output_token,
+            cost: item.cost
+          }
+        })
+
+        //usage_month를 usage_date , source, name으로 groupby해서 cost, token을 합산
+        let result = usage_month.reduce((acc, item) => {
+          let key = item.usage_date + item.source + item.name
+          if (acc[key]) {
+            acc[key].cost += item.cost
+            acc[key].input_token += item.input_token
+            acc[key].output_token += item.output_token
+          } else {
+            acc[key] = {
+              usage_date: item.usage_date,
+              source: item.source,
+              name: item.name,
+              cost: item.cost,
+              input_token: item.input_token,
+              output_token: item.output_token
+            }
+          }
+          return acc
+        }, {})
+        usage_month = Object.values(result)
+
       }
 
       let failure_callback = (json_error) => {
@@ -44,12 +89,14 @@
     $: if (query_type == 'day')
     {
         usage_table_head[0].desc = '이용일자'
+        usage_table_body = usage_day
     }
     else
     {
         usage_table_head[0].desc = '이용월'
         //같은 월끼리 token cost sum
-        
+
+        usage_table_body=usage_month
 
     }
 
