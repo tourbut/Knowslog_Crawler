@@ -14,8 +14,10 @@ class Usage(SQLModel):
 
 class OutMessage(SQLModel):
     content: str
+    thought : str = None
     input_token: int | None = None
     output_token: int | None = None
+    create_date: datetime = datetime.now()
     is_done: bool = False
     
 class GetUserLLM(SQLModel):

@@ -24,6 +24,9 @@ from langchain_core.messages import (
     BaseMessage,
     HumanMessage,
 )
+
+from langchain_community.callbacks import get_openai_callback
+
 router = APIRouter()
 
 REDIS_URL = settings.REDIS_URL
@@ -65,13 +68,25 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
                               )
         
         chunks=[]
+        thought = None
         
-        async for chunk in chain.astream({'input':input}):
-            chunks.append(chunk)
-            yield chat_schema.OutMessage(content=chunk.content,
-                                         input_token=chunk.usage_metadata['input_tokens'] if chunk.usage_metadata is not None else None,
-                                         output_token=chunk.usage_metadata['output_tokens'] if chunk.usage_metadata is not None else None,
-                                         is_done=False).model_dump_json()
+        callback_handler = get_openai_callback()
+        
+        input_token=0
+        output_token=0
+        
+        with callback_handler as cb:
+            async for chunk in chain.astream({'input':input}):
+                thought = chunk['thought']
+                answer = chunk['answer']
+                chunks.append(answer)
+                yield chat_schema.OutMessage(content=answer.content,
+                                            thought=thought.THOUGHT,
+                                            input_token=answer.usage_metadata['input_tokens'] if answer.usage_metadata is not None else None,
+                                            output_token=answer.usage_metadata['output_tokens'] if answer.usage_metadata is not None else None,
+                                            is_done=False).model_dump_json()
+            input_token = cb.prompt_tokens
+            output_token = cb.completion_tokens
             
         response=chunks[0]
         
@@ -87,8 +102,8 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
         messages.append(bot_message)
 
         usage = chat_schema.Usage(user_llm_id=chat_in.user_llm_id,
-                                  input_token=response.usage_metadata['input_tokens'],
-                                  output_token=response.usage_metadata['output_tokens'])
+                                  input_token=input_token,
+                                  output_token=output_token)
         
         await chat_crud.create_messages(session=session,messages=messages,usage=usage)
         
@@ -115,9 +130,11 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
                 },
             )
         
-        yield chat_schema.OutMessage(content=response.content,
-                                    input_token=response.usage_metadata['input_tokens'],
-                                    output_token=response.usage_metadata['output_tokens'],
+        yield chat_schema.OutMessage(content=bot_message.content,
+                                     thought=thought.THOUGHT,
+                                    input_token=input_token,
+                                    output_token=output_token,
+                                    create_date=bot_message.create_date.strftime("%Y-%m-%d %H:%M:%S"),
                                     is_done=True).model_dump_json()
         
     return StreamingResponse(chain_astream(chat_in.input),media_type='text/event-stream')

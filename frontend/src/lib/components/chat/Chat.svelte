@@ -7,6 +7,9 @@
     import { send_message, get_messages } from "$lib/apis/chat";
     import { addToast } from '$lib/common';
 
+    import { username } from '$lib/stores';
+    import { get } from "svelte/store";
+
     export let userllm_list = []
     export let chat_id = ''
     export let selected_userllm={value:0,name:"모델선택"}
@@ -25,7 +28,7 @@
         }
 
         let message = {
-            name: '',
+            name: get(username),
             msg: user_msg,
             time: new Date().toLocaleString(),
             is_user: true
@@ -34,6 +37,7 @@
         let res_msg= {
             name: 'Knowslog Bot',
             msg: '',
+            addtional_info: '',
             time: new Date().toLocaleString(),
             is_user: false
         }
@@ -56,12 +60,15 @@
         }
 
         let streamCallback = (json) => {
-            
             if (json.is_done){
+                message_list[message_list.length-1].addtional_info = json.thought
                 message_list[message_list.length-1].msg = json.content
             }
             else{
-                message_list[message_list.length-1].msg += json.content
+                console.log(json)
+                message_list[message_list.length-1].addtional_info = json.thought
+                message_list[message_list.length-1].msg = json.content
+                message_list[message_list.length-1].time = json.create_date
             }
         }
         await send_message(params, success_callback, failure_callback,streamCallback);

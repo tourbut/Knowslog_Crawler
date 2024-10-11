@@ -1,7 +1,10 @@
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_core.runnables.history import RunnableWithMessageHistory
-from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough,RunnableParallel
+from langchain.callbacks import StdOutCallbackHandler
+from langchain.callbacks.manager import CallbackManager
+
 from operator import itemgetter
 
 from .prompt import (
@@ -13,12 +16,15 @@ from .prompt import (
     get_thinking_prompt,
     get_thinking_chatbot)
 
-from .parser import strparser
+from .parser import strparser,pydantic_parser
 
 from langchain.globals import set_llm_cache
 from langchain_community.cache import SQLiteCache, SQLAlchemyCache
 #from ...deps import engine
 #set_llm_cache(SQLAlchemyCache(engine))
+
+import langchain
+langchain.debug = True
 
 set_llm_cache(SQLiteCache(database_path=".cache.db"))
 
@@ -113,6 +119,9 @@ def thinking_chatbot_chain(api_key:str,
                            temperature:float=0.7,
                            callback_manager=None,
                            memory=None):
+    
+    callback_manager = CallbackManager([StdOutCallbackHandler()])
+    
     if model.startswith('gpt'):
         llm = ChatOpenAI(model=model,
                         temperature=temperature,
@@ -132,14 +141,34 @@ def thinking_chatbot_chain(api_key:str,
         chat_history=RunnableLambda(memory.load_memory_variables)
         | itemgetter("chat_history")  # memory_key 와 동일하게 입력합니다.
         )
-    think_prompt = get_thinking_prompt()
+    
+    think_prompt = get_thinking_prompt(pydantic_parser)
     prompt = get_thinking_chatbot()
     
-    chain = (
-                {
-                    "thought":runnable|think_prompt|llm|strparser,
-                    "input":RunnablePassthrough()
-                }|prompt|llm
-            )
     
-    return chain
+    think_chain = runnable|think_prompt|llm|pydantic_parser
+    answer_chain = prompt|llm
+
+    def get_thought(output):
+        return output["thought"]
+    
+    def output_formatter(output):
+        return {
+            "thought": output["thought"],
+            "answer": output["answer"]
+        }
+        
+    final_chain = (
+        RunnableParallel(
+            thought = think_chain,
+            input = RunnablePassthrough()
+        )
+        |{
+            "thought":RunnableLambda(get_thought),
+            "answer":answer_chain
+        }
+        |RunnableLambda(output_formatter)
+        )
+    
+    
+    return final_chain
