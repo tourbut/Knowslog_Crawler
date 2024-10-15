@@ -2,6 +2,7 @@ from sqlmodel import Field, SQLModel, desc
 from pydantic import EmailStr
 import uuid
 from datetime import datetime
+from typing import Optional
 
 class CommonBase(SQLModel):
     create_date: datetime = Field(default=datetime.now())
@@ -61,6 +62,9 @@ class UserFiles(CommonBase, table=True):
     file_type:str = Field(nullable=False,description="파일타입")
     file_ext:str = Field(nullable=False,description="파일확장자")
     file_desc:str | None = Field(nullable=True,description="파일설명")
+    embedding_yn:bool = Field(default=False,nullable=True,description="임베딩여부")
+    embedding_model_id:Optional[uuid.UUID] = Field(foreign_key="llm.id",nullable=True,description="임베딩모델ID")
+    collection_id:Optional[uuid.UUID] = Field(nullable=True,description="컬렉션ID")
 
 class Archive(CommonBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
@@ -72,6 +76,9 @@ class Archive(CommonBase, table=True):
     content: str = Field(nullable=False)
     url : str = Field(nullable=False)
     dom: str | None = Field(nullable=True)
+    embedding_yn:bool = Field(default=False,nullable=True,description="임베딩여부")
+    embedding_model_id:Optional[uuid.UUID] = Field(foreign_key="llm.id",nullable=True,description="임베딩모델ID")
+    collection_id:Optional[uuid.UUID] = Field(nullable=True,description="컬렉션ID")
 
 class Refine(CommonBase, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")

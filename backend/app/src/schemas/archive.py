@@ -77,6 +77,9 @@ class FileUpload(SQLModel):
     file_type:str
     file_ext:str
     file_desc:str | None = None
+    embedding_yn:bool = False
+    embedding_model_id:uuid.UUID | None = None
+    collection_id:uuid.UUID | None = None
     
 class ResponseFile(SQLModel):
     id: uuid.UUID
