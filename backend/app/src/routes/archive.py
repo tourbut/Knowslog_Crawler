@@ -5,15 +5,15 @@ from typing import Any,List
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse,StreamingResponse
 
-from app.src.deps import SessionDep_async,CurrentUser
+from app.src.deps import SessionDep_async,CurrentUser,engine
 from app.src.crud import archive as archive_crud
 from app.src.schemas import archive as archive_schema
 
 from app.core.config import settings
 from app.src.engine.crawler import get_medium,get_webpage
 from app.src.engine.llms.chain import translate_chain,summarize_chain
-from app.src.engine.llms.file_embedding import load_and_split,embedding_and_store
-from datetime import datetime
+from app.src.engine.llms.embeddings import load_and_split,embedding_and_store
+
 from requests.exceptions import RequestException
 
 from tempfile import NamedTemporaryFile
@@ -80,7 +80,7 @@ async def run_archiving(*, session: SessionDep_async, current_user: CurrentUser,
     
     try:
         if archive_in.auto_translate or archive_in.auto_summarize:
-            userllm = await archive_crud.get_userllm(session=session,user_id=current_user.id)
+            userllm = await archive_crud.get_userllm(session=session,user_id=current_user.id,llm_type='llm')
 
         if url.find("medium.com") != -1:
             if (url.startswith("https://") or url.startswith("http://"))== False:
@@ -192,22 +192,56 @@ async def save_file(file: IO,user_id:uuid.UUID) -> str:
         
     with NamedTemporaryFile("wb", delete=False,dir=user_file_path) as tempfile:
         tempfile.write(file.read())
-        return tempfile.name
+        return tempfile.name,user_file_path 
 
 @router.post("/upload_flies/",response_model=archive_schema.ResponseFile)
 async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,file: UploadFile):
     try:
-        path = await save_file(file.file,user_id=current_user.id)
+        # Get userllm
+        userllm = await archive_crud.get_userllm(session=session,user_id=current_user.id,llm_type='embedding')
+        
+        # Save file and load and split
+        path,userdir_path = await save_file(file.file,user_id=current_user.id)
         file_meta = archive_schema.FileUpload(file_name=file.filename,
                                               file_path=path,
                                               file_size=os.path.getsize(path),
                                               file_type=file.content_type,
                                               file_ext=file.filename.split(".")[-1])
+        
         db_obj = await archive_crud.create_file(session=session,file=file_meta,user_id=current_user.id)
         docs = await load_and_split(file_ext=file.filename.split(".")[-1],file_path=path)
         
-        contents = [doc.page_content for doc in docs]
+
+        # Embedding and store
+        collection_metadata = {"file_name":file_meta.file_name,
+                               "file_size":file_meta.file_size,
+                               "file_ext":file_meta.file_ext,
+                               "file_desc":file_meta.file_desc}
         
+        vectorstore,used_tokens = await embedding_and_store(docs=docs,
+                                                connection=engine,
+                                                collection_name=db_obj.id.hex, #Userfiles의 ID
+                                                api_key=userllm.api_key,
+                                                model=userllm.name,
+                                                cache_dir=f"{userdir_path}/.cache",
+                                                collection_metadata=collection_metadata)
+        
+        
+        db_obj.embedding_yn = True
+        db_obj.embedding_model_id = userllm.llm_id
+        db_obj.collection_id = vectorstore.uuid
+        
+        await archive_crud.update_file(session=session,file=db_obj)
+
+        # Save usage
+        if used_tokens > 0:
+            embedding_usage = archive_schema.Usage(user_llm_id=userllm.llm_id,
+                                                   input_token=used_tokens,
+                                                   output_token=0)
+            await archive_crud.create_usage(session=session,usage=embedding_usage)
+
+        # Return response
+        contents = [doc.page_content for doc in docs]        
         response = archive_schema.ResponseFile(id=db_obj.id,
                                                file_name=file_meta.file_name,
                                                file_size=file_meta.file_size,

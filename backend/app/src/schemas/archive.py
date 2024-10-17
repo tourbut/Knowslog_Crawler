@@ -55,6 +55,7 @@ class GetUserLLM(SQLModel):
     source: str
     name: str
     api_key: str
+    llm_id: uuid.UUID
     
 class Update_Archive(SQLModel):
     id: uuid.UUID 
