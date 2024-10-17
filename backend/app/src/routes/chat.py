@@ -14,7 +14,7 @@ from app.src.engine.llms.chain import (
     chatbot_chain,
     thinking_chatbot_chain
 )
-from app.src.engine.llms.memory import pg_vetorstore_with_memory
+from app.src.engine.llms.memory import pg_vetorstore_with_memory, pg_vetorstore
 from datetime import datetime
 from requests.exceptions import RequestException
 from langchain_redis import RedisChatMessageHistory
@@ -47,6 +47,13 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
                                        api_key=userllm.api_key,
                                        model="text-embedding-3-large",
                                        search_kwargs={"k": 1})
+    
+    retriever = pg_vetorstore(connection=engine,
+                                collection_name=chat_in.chat_id.hex,
+                                api_key=userllm.api_key,
+                                model="text-embedding-3-large",
+                                async_mode=False
+                                ).as_retriever()
     
     # Get or create a RedisChatMessageHistory instance
     history = get_redis_history(chat_in.chat_id.hex)
@@ -165,9 +172,7 @@ async def get_messages(*, session: SessionDep_async, current_user: CurrentUser, 
                 create_date=datetime.strptime(message.additional_kwargs["create_date"],"%Y-%m-%d %H:%M:%S")
             )
             messages.append(msg)
-        
-        # DB에서 메시지를 가져오는 코드    
-        
+           
     except Exception as e:
         print(e)
         messages = await chat_crud.get_messages(session=session,current_user=current_user,chat_id=chat_id)
@@ -178,6 +183,11 @@ async def get_messages(*, session: SessionDep_async, current_user: CurrentUser, 
 async def get_userllm(*, session: SessionDep_async, current_user: CurrentUser):
     userllm = await chat_crud.get_userllm(session=session,user_id=current_user.id)
     return userllm
+
+@router.get("/get_documents",response_model=List[chat_schema.GetDocument])
+async def get_documents(*, session: SessionDep_async, current_user: CurrentUser):
+    documents = await chat_crud.get_documents(session=session,current_user=current_user)
+    return documents
 
 @router.put("/delete_chat")
 async def delete_chat(*, session: SessionDep_async, current_user: CurrentUser,chat_in:chat_schema.Update_Chat):

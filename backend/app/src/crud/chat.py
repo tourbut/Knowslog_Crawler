@@ -2,7 +2,7 @@ from typing import List
 import uuid
 from app.models import *
 from app.src.schemas import chat as chat_schema
-from sqlmodel import select
+from sqlmodel import select, union_all
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 
@@ -150,6 +150,27 @@ async def update_chat(*,session: AsyncSession, chat: chat_schema.Update_Chat) ->
             await session.commit()
             await session.refresh(db_chat)
         return db_chat
+    except Exception as e:
+        print(e)
+        await session.rollback()
+        raise e
+
+async def get_documents(*, session: AsyncSession, current_user: User) -> List[chat_schema.GetDocument]:
+    try:
+        archive_statement = select(Archive.title.label("title"),
+                                   Archive.collection_id).where(Archive.user_id == current_user.id,
+                                                               Archive.delete_yn == False,
+                                                               Archive.embedding_yn == True)
+                                   
+        userfiles_statement = select(UserFiles.file_name.label("title"),
+                                     UserFiles.collection_id).where(UserFiles.user_id == current_user.id,
+                                                               UserFiles.delete_yn == False,
+                                                               UserFiles.embedding_yn == True)
+                                     
+        statement = union_all(archive_statement, userfiles_statement)
+        
+        documents = await session.exec(statement)
+        return documents.all()
     except Exception as e:
         print(e)
         await session.rollback()

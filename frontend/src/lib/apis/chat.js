@@ -34,3 +34,8 @@ export async function delete_chat(params, success_callback, failure_callback) {
     let url = "/chat/delete_chat/"
     await fastapi('put', url, params,success_callback,failure_callback)
 }
+
+export async function get_documents(params, success_callback, failure_callback) {
+    let url = "/chat/get_documents/"
+    await fastapi('get', url, params,success_callback,failure_callback)
+}

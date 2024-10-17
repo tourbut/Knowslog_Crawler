@@ -78,4 +78,7 @@ class Usage(SQLModel):
     user_llm_id: uuid.UUID  
     input_token:int 
     output_token:int
-    
+
+class GetDocument(SQLModel):
+    title: str
+    collection_id: uuid.UUID
