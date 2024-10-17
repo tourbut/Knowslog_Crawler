@@ -211,7 +211,6 @@ async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,f
         db_obj = await archive_crud.create_file(session=session,file=file_meta,user_id=current_user.id)
         docs = await load_and_split(file_ext=file.filename.split(".")[-1],file_path=path)
         
-
         # Embedding and store
         collection_metadata = {"file_name":file_meta.file_name,
                                "file_size":file_meta.file_size,
@@ -233,15 +232,12 @@ async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,f
         
         await archive_crud.update_file(session=session,file=db_obj)
 
-        # Save usage
-        if used_tokens > 0:
-            embedding_usage = archive_schema.Usage(user_llm_id=userllm.llm_id,
-                                                   input_token=used_tokens,
-                                                   output_token=0)
-            await archive_crud.create_usage(session=session,usage=embedding_usage)
-
         # Return response
-        contents = [doc.page_content for doc in docs]        
+        async def get_contents(docs):
+            contents = [doc.page_content for doc in docs]
+            return contents
+        
+        contents = await get_contents(docs)   
         response = archive_schema.ResponseFile(id=db_obj.id,
                                                file_name=file_meta.file_name,
                                                file_size=file_meta.file_size,
@@ -249,6 +245,13 @@ async def upload_flies(*, session: SessionDep_async, current_user: CurrentUser,f
                                                file_desc=file_meta.file_desc,
                                                contents=contents)
         
+        # Save usage
+        if used_tokens > 0:
+            embedding_usage = archive_schema.Usage(user_llm_id=userllm.id,
+                                                   input_token=used_tokens,
+                                                   output_token=0)
+            await archive_crud.create_usage(session=session,usage=embedding_usage)
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=404, detail=f"파일 업로드에 실패하였습니다.")

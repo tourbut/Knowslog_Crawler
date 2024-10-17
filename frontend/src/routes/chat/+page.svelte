@@ -136,17 +136,18 @@
     
 </script>
 
-<div>
-    {#if dataLoaded}
-        <Sidebar btn_item_more_click={closeChat} btn_add_button={createChat} bind:side_menus={chat_list} btn_click={onclick}/>
-    {/if}
-</div> 
-<div class="chat-container">
-    {#if chat_id}
-        <Chat bind:chat_id={chat_id} bind:userllm_list={userllm_list} bind:selected_userllm={selected_userllm}/>
-    {/if}
+<div class="flex h-screen overflow-hidden">
+    <div class="w-64 flex-shrink-0">
+        {#if dataLoaded}
+            <Sidebar btn_item_more_click={closeChat} btn_add_button={createChat} bind:side_menus={chat_list} btn_click={onclick}/>
+        {/if}
+    </div> 
+    <div class="chat-container">
+        {#if chat_id}
+            <Chat bind:chat_id={chat_id} bind:userllm_list={userllm_list} bind:selected_userllm={selected_userllm}/>
+        {/if}
+    </div>
 </div>
-
 <ComboModal header={"채팅방생성"} bind:table_head={table_head} formModal={showModal} bind:form_data={form_data} btn_click={btn_create_chat} > </ComboModal>
 
 <style>
