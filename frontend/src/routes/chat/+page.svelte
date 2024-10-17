@@ -3,7 +3,7 @@
     import Sidebar from '$lib/components/common/Sidebar.svelte';
     import { onMount } from 'svelte';
     import ComboModal from "$lib/components/common/Combo_Modal.svelte";
-    import { create_chat, get_userllm, get_chat_list, delete_chat, get_chat} from "$lib/apis/chat";
+    import { create_chat, get_userllm, get_chat_list, delete_chat, get_chat, get_documents} from "$lib/apis/chat";
     import { addToast } from '$lib/common';
 
     let chat_list = []
@@ -11,6 +11,7 @@
     let showModal = false;
     let dataLoaded = false;
     let userllm_list = []
+    let userdocument_list = []
     let selected_userllm={value:0,name:"모델선택"}
     let table_head=[
         {id:0,name:"userllm_id",type:"combo",desc:"모델선택",combo:userllm_list},
@@ -121,13 +122,15 @@
             table_head[0].combo=userllm_list
         }
 
-        let userllm_failure_callback = (json_error) => {
-            addToast('error',json_error.detail)
+        let documents_success_callback = (json) => {
+            userdocument_list= json.map(item => {return {value:item.id,title:item.title}}) 
         }
 
-        await get_userllm(params, userllm_success_callback, userllm_failure_callback);
+        await get_userllm(params, userllm_success_callback, failure_callback);
 
         await get_chat_list(params, success_callback, failure_callback);
+
+        await get_documents(params,documents_success_callback,failure_callback)
     }   
     
     onMount(async () => {
@@ -144,7 +147,8 @@
     </div> 
     <div class="chat-container">
         {#if chat_id}
-            <Chat bind:chat_id={chat_id} bind:userllm_list={userllm_list} bind:selected_userllm={selected_userllm}/>
+            <Chat bind:chat_id={chat_id} bind:userllm_list={userllm_list} bind:userdocument_list={userdocument_list} 
+                  bind:selected_userllm={selected_userllm}/>
         {/if}
     </div>
 </div>
