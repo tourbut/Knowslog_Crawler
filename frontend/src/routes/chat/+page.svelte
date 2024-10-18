@@ -13,9 +13,11 @@
     let userllm_list = []
     let userdocument_list = []
     let selected_userllm={value:0,name:"모델선택"}
+    let selected_userdocument={value:0,name:"문서선택"}
     let table_head=[
         {id:0,name:"userllm_id",type:"combo",desc:"모델선택",combo:userllm_list},
-        {id:1,name:"title",type:"text",desc:"채팅방명"}
+        {id:1,name:"userdocument_id",type:"combo",desc:"파일선택",combo:userdocument_list},
+        {id:2,name:"title",type:"text",desc:"채팅방명"}
     ];
 
 
@@ -123,7 +125,9 @@
         }
 
         let documents_success_callback = (json) => {
-            userdocument_list= json.map(item => {return {value:item.id,title:item.title}}) 
+            userdocument_list= json.map(item => {return {value:item.collection_id,name:item.title}}) 
+            console.log(userdocument_list)
+            table_head[1].combo=userdocument_list
         }
 
         await get_userllm(params, userllm_success_callback, failure_callback);
@@ -147,8 +151,11 @@
     </div> 
     <div class="chat-container">
         {#if chat_id}
-            <Chat bind:chat_id={chat_id} bind:userllm_list={userllm_list} bind:userdocument_list={userdocument_list} 
-                  bind:selected_userllm={selected_userllm}/>
+            <Chat bind:chat_id={chat_id} 
+                  bind:userllm_list={userllm_list}
+                  bind:userdocument_list={userdocument_list} 
+                  bind:selected_userllm={selected_userllm}
+                  bind:selected_userdocument={selected_userdocument} />
         {/if}
     </div>
 </div>

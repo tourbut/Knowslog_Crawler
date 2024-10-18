@@ -4,7 +4,8 @@ from datetime import datetime
 
 class SendMessage(SQLModel):
     chat_id: uuid.UUID 
-    user_llm_id: uuid.UUID  
+    user_llm_id: uuid.UUID
+    document_id: uuid.UUID  
     input: str
     
 class Usage(SQLModel):

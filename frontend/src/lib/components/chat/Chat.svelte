@@ -14,7 +14,7 @@
     export let userdocument_list = []
     export let chat_id = ''
     export let selected_userllm={value:0,name:"모델선택"}
-    export let selected_userdocument={value:0,title:"문서선택"}
+    export let selected_userdocument={value:0,name:"문서선택"}
     
     let message_list= []
     let user_msg = '';
@@ -50,6 +50,7 @@
         let params = {
             chat_id: chat_id,
             user_llm_id: selected_userllm.value,
+            document_id: selected_userdocument.value,
             input: user_msg,
         }
 
@@ -67,7 +68,6 @@
                 message_list[message_list.length-1].msg = json.content
             }
             else{
-                console.log(json)
                 message_list[message_list.length-1].addtional_info = json.thought
                 message_list[message_list.length-1].msg = json.content
                 message_list[message_list.length-1].time = json.create_date
@@ -121,12 +121,12 @@
             {/each}
           </Dropdown>  
           <NavLi class="cursor-pointer">
-            {selected_userdocument.title}
+            {selected_userdocument.name}
             <ChevronDownOutline class="w-6 h-6 ms-2 text-primary-800 dark:text-white inline" />
           </NavLi>
           <Dropdown class="w-50 z-20">
             {#each userdocument_list as document}
-                <DropdownItem on:click={()=>{selected_userdocument=document}}>{document.title}</DropdownItem>
+                <DropdownItem on:click={()=>{selected_userdocument=document}}>{document.name}</DropdownItem>
             {/each}
           </Dropdown>
         </NavUl>

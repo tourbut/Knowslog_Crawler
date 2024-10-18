@@ -13,8 +13,9 @@ async def get_userllm(*, session: AsyncSession,user_id:uuid.UUID) -> List[chat_s
                         LLM.name,
                         UserAPIKey.api_key).where(UserLLM.user_id == user_id,
                                                     UserLLM.llm_id == LLM.id,
-                                                    UserLLM.api_id ==UserAPIKey.id,
-                                                    UserLLM.active_yn == True)
+                                                    UserLLM.api_id == UserAPIKey.id,
+                                                    UserLLM.active_yn == True,
+                                                    LLM.type == "llm")
         userllm = await session.exec(statement)
         if not userllm:
             return None
