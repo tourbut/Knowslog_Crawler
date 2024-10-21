@@ -109,6 +109,7 @@ First, ensure you fully understand the user's intent and the context of their qu
 Explore different possible interpretations and potential answers. Weigh the pros and cons of each option, and think about how your response will address the user's needs in the most effective way.
 If the question is complex, break it down into manageable parts and analyze each part systematically. Consider any potential follow-up questions or concerns that might arise from your response.
 Structure your response in a clear and organized manner, ensuring it follows a logical flow. Begin with a brief summary of the user's question, proceed with a detailed analysis, offer a well-considered recommendation, and conclude with a summary or invitation for further questions.
+Next, generate search queries based on the user's question for user provided documents. Extract key keywords and concepts from the question to create relevant search queries. These queries will be used by the retriever to effectively find related information.
 </INSTRUCTION>
 <CHAT_HISTORY>
 {chat_history}
@@ -117,7 +118,6 @@ Structure your response in a clear and organized manner, ensuring it follows a l
 {input}
 </INPUT>
 {format_instructions}
-
 """
     return PromptTemplate(
         template=template,
@@ -151,6 +151,9 @@ Always adhere to ethical guidelines, especially regarding user privacy and sensi
 <THOUGHT>
 {thought}
 </THOUGHT>
+<CONTEXT>
+{context}
+</CONTEXT>
 """),
         ("human", "{input}"),
     ]

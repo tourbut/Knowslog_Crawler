@@ -50,7 +50,7 @@
         let params = {
             chat_id: chat_id,
             user_llm_id: selected_userllm.value,
-            document_id: selected_userdocument.value,
+            document_id: selected_userdocument.value == 0 ? null : selected_userdocument.value,
             input: user_msg,
         }
 

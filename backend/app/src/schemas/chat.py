@@ -5,7 +5,7 @@ from datetime import datetime
 class SendMessage(SQLModel):
     chat_id: uuid.UUID 
     user_llm_id: uuid.UUID
-    document_id: uuid.UUID  
+    document_id: uuid.UUID | None = None
     input: str
     
 class Usage(SQLModel):
@@ -16,6 +16,7 @@ class Usage(SQLModel):
 class OutMessage(SQLModel):
     content: str
     thought : str = None
+    tools : dict = None
     input_token: int | None = None
     output_token: int | None = None
     create_date: datetime = datetime.now()

@@ -118,7 +118,9 @@ def thinking_chatbot_chain(api_key:str,
                            model:str='gpt-4o-mini',
                            temperature:float=0.7,
                            callback_manager=None,
-                           memory=None):
+                           memory=None,
+                           retriever=None
+                           ):
     
     callback_manager = CallbackManager([StdOutCallbackHandler()])
     
@@ -150,7 +152,17 @@ def thinking_chatbot_chain(api_key:str,
     answer_chain = prompt|llm
 
     def get_thought(output):
-        return output["thought"]
+        return output["thought"].THOUGHT
+    
+    def get_context(output):
+        if retriever:
+            docs = retriever.invoke(output["thought"].search_msg)
+            rtn = ""
+            for doc in docs:
+                rtn += doc.page_content + "\n\n"
+            return rtn
+        else:
+            return ""
     
     def output_formatter(output):
         return {
@@ -165,6 +177,12 @@ def thinking_chatbot_chain(api_key:str,
         )
         |{
             "thought":RunnableLambda(get_thought),
+            "context":RunnableLambda(get_context),
+            "input" : RunnablePassthrough()
+        }|
+        {
+            "thought":RunnablePassthrough(),
+            "context":RunnablePassthrough(),
             "answer":answer_chain
         }
         |RunnableLambda(output_formatter)

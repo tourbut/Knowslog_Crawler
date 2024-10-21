@@ -13,8 +13,8 @@
         }
     };
 
-    function handleSubmit() {
-        sendMessage();
+    async function handleSubmit() {
+        await sendMessage();
         message = ''; // 메시지를 비웁니다.
     }
 

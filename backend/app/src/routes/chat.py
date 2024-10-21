@@ -6,6 +6,8 @@ from fastapi import APIRouter, HTTPException
 from app.src.deps import SessionDep_async,CurrentUser,async_engine,engine
 from app.src.crud import chat as chat_crud
 from app.src.schemas import chat as chat_schema
+from app.src.crud import pgvector as pgvector_crud
+from app.src.schemas import pgvector as pgvector_schema
 from fastapi.responses import StreamingResponse
 from app.core.config import settings
 from app.src.engine.llms.chain import (
@@ -47,13 +49,17 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
                                        api_key=userllm.api_key,
                                        model="text-embedding-3-large",
                                        search_kwargs={"k": 1})
+    retriever = None
+    if chat_in.document_id is not None:
+        collection = await pgvector_crud.get_collection(session=session,collection_id=chat_in.document_id)
+        retriever = pg_vetorstore(connection=engine,
+                                    collection_name=collection.name,
+                                    api_key=userllm.api_key,
+                                    model="text-embedding-3-large",
+                                    async_mode=False
+                                    ).as_retriever()
     
-    retriever = pg_vetorstore(connection=engine,
-                                collection_name=chat_in.chat_id.hex,
-                                api_key=userllm.api_key,
-                                model="text-embedding-3-large",
-                                async_mode=False
-                                ).as_retriever()
+
     
     # Get or create a RedisChatMessageHistory instance
     history = get_redis_history(chat_in.chat_id.hex)
@@ -71,7 +77,8 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
         chain = thinking_chatbot_chain(api_key=userllm.api_key,
                               model=userllm.name,
                               #get_redis_history=get_redis_history
-                              memory=memory
+                              memory=memory,
+                              retriever=retriever
                               )
         
         chunks=[]
@@ -88,7 +95,8 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
                 answer = chunk['answer']
                 chunks.append(answer)
                 yield chat_schema.OutMessage(content=answer.content,
-                                            thought=thought.THOUGHT,
+                                            thought=thought['thought'],
+                                            tools = {"retriever": thought['context']},
                                             input_token=answer.usage_metadata['input_tokens'] if answer.usage_metadata is not None else None,
                                             output_token=answer.usage_metadata['output_tokens'] if answer.usage_metadata is not None else None,
                                             is_done=False).model_dump_json()
@@ -138,7 +146,8 @@ async def send_message(*, session: SessionDep_async, current_user: CurrentUser,c
             )
         
         yield chat_schema.OutMessage(content=bot_message.content,
-                                     thought=thought.THOUGHT,
+                                     thought=thought['thought'],
+                                     tools = {"retriever": thought['context']},
                                     input_token=input_token,
                                     output_token=output_token,
                                     create_date=bot_message.create_date.strftime("%Y-%m-%d %H:%M:%S"),
