@@ -119,6 +119,7 @@ class Chats(CommonBase,table=True):
     user_id: uuid.UUID  = Field(foreign_key="user.id", description="유저ID")
     title: str = Field(nullable=False, description="채팅명")
     user_llm_id: uuid.UUID  = Field(foreign_key="userllm.id", description="유저LLMID")
+    user_file_id: uuid.UUID  = Field(foreign_key="userfiles.id", description="유저파일ID")
 
 class Messages(CommonBase,table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True, description="ID")
