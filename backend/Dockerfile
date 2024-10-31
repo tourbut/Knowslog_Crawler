@@ -10,8 +10,6 @@ RUN pip install --no-cache-dir -r /tmp/requirements.txt
 
 COPY ./backend/config/gunicorn_conf.py /app/gunicorn_conf.py
 
-COPY ./backend/alembic.ini /app/
-COPY ./backend/prestart.sh /app/
-COPY ./backend/start.sh /app/
-
-RUN chmod +x /app/start.sh
+COPY ./backend/alembic.ini /app/alembic.ini
+COPY ./backend/config/prestart.sh /app/prestart.sh
+COPY ./backend/config/start.sh /app/start.sh
